@@ -1,0 +1,38 @@
+# Python virtual environments & bytecode
+venv/
+env/
+**/venv/
+**/env/
+**/__pycache__/
+**/*.py[cod]
+*$py.class
+
+# Node dependencies
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and secrets
+**/.env
+*.env
+service_account_key.json
+*.json.key
+
+# Local SQLite databases & logs
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+*.log
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# Standalone root directories superseded by 'TASK 1(TRANSLATION APP AI)'
+/translation_app/
+/auth-backend/
