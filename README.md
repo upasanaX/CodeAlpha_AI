@@ -16,11 +16,11 @@
 
 Welcome to the **CodeAlpha Artificial Intelligence Internship** portfolio repository engineered by **Upasana Roy**. 
 
-This repository showcases production-ready, full-stack AI web applications built during the **CodeAlpha AI Internship**. Each project addresses real-world communication and learning workflows through modern Machine Learning, Natural Language Processing (NLP), and robust full-stack software design:
+This repository showcases production-ready, full-stack AI web applications built during the **CodeAlpha AI Internship**. Each project addresses real-world communication, intelligent automation, and perception challenges through state-of-the-art Machine Learning, Natural Language Processing (NLP), Computer Vision, and robust full-stack software engineering:
 
 - 🌐 **Task 1: LinguoFlow PRO ✨ (AI Language Translation)**: A feature-rich multilingual translation suite built with Flask, deep-translator, Web Speech API dictation (STT), high-fidelity speech synthesis (TTS), tone and personality variations, and persistent cloud history sync.
 - 🤖 **Task 2: Coursemate AI Assistant 🎓 (Intelligent FAQ Chatbot)**: A full-stack FAQ chatbot application built for an online learning academy utilizing an NLTK NLP preprocessing pipeline (lowercasing, punctuation stripping, tokenization, stopword removal, WordNet lemmatization), Scikit-learn TF-IDF vectorization, Cosine Similarity matching, an SQLite knowledge base with 22 curated Q&As, a React + Vite + TypeScript + Tailwind chat UI, and an interactive Knowledge Base Admin panel with live model re-training.
-- 🎯 **Task 4: TrackOptic AI 🎯 (Real-Time Vision & Tracking)**: A production-quality real-time computer vision system featuring Ultralytics YOLOv8 object detection, SORT multi-object tracking (Kalman Filter + Hungarian Algorithm), FastAPI WebSocket frame streaming, SQLite telemetry logging, custom optical target branding, and a formal reddish React + TypeScript + Tailwind web application with dual-mode webcam / video file processing and seamless Light & Dark mode support.
+- 🎯 **Task 4: TrackOptic AI 🎯 (Precision Multi-Object Detection & Tracking)**: A high-performance, real-time computer vision command center powered by pre-trained **YOLOv8s/YOLOv8n** object detection, **SORT** multi-object tracking (Kalman Filter + Hungarian Algorithm), **Kalman Motion Trajectory Trails**, an interactive **Virtual Laser Tripwire & Bidirectional Flow Counter** (`⬆️ IN` / `⬇️ OUT` / `Total`), **Multi-Spectrum Optical Filters** (**FLIR Thermal IR** and **Tactical Night Vision NVG**), **JWT User Authentication**, **Live Sensitivity Sliders**, and a formal reddish React + TypeScript + Tailwind design system with complete **Light & Dark Mode** support.
 
 All projects are completely self-contained in dedicated folders with independent dependencies, automated test suites, responsive user interfaces, and detailed quick-start instructions.
 
@@ -32,7 +32,7 @@ All projects are completely self-contained in dedicated folders with independent
 |---|---|---|---|---|
 | **Task 1** | **LinguoFlow PRO ✨** | Intelligent Multilingual AI Translation Web App with Voice Dictation, Speech Synthesis, Theme Switching, and Cloud Sync | [`TASK 1(TRANSLATION APP AI)/`](TASK%201(TRANSLATION%20APP%20AI)/) | ✅ Complete & Verified |
 | **Task 2** | **Coursemate AI FAQ Assistant 🤖** | Production-Ready FAQ Chatbot Web App with NLTK Preprocessing, TF-IDF Vectorization, Cosine Similarity & Admin Knowledge Base | [`TASK 2 (FAQ CHATBOT AI)/`](TASK%202%20(FAQ%20CHATBOT%20AI)/) | ✅ Complete & Verified |
-| **Task 4** | **TrackOptic AI 🎯** | Real-Time Object Detection (YOLOv8) & Multi-Object Tracking (SORT) with WebSocket Streaming, Optical Vector Logo & Light/Dark Mode | [`TASK 4 (OBJECT DETECTION AND TRACKING)/`](TASK%204%20(OBJECT%20DETECTION%20AND%20TRACKING)/) | ✅ Complete & Verified |
+| **Task 4** | **TrackOptic AI 🎯** | Precision Real-Time Object Detection & Tracking with Kalman Motion Trails, Virtual Laser Tripwire Counter, Multi-Spectrum Shaders & Light/Dark Mode | [`TASK 4 (OBJECT DETECTION AND TRACKING)/`](TASK%204%20(OBJECT%20DETECTION%20AND%20TRACKING)/) | ✅ Complete & Verified |
 
 ---
 
@@ -141,8 +141,8 @@ CodeAlpha_AI/
         ├── tailwind.config.js             # Formal reddish theme palette setup
         ├── index.html                     # HTML5 entry point
         └── src/
-            ├── App.tsx                    # Main viewport, HUD, and session manager
-            ├── components/                # Header, ControlPanel, VideoDisplay, SessionTable, DetectionModal
+            ├── App.tsx                    # Main controller, HUD, WebSocket, and view router
+            ├── components/                # LandingPage, Header, ControlPanel, VideoDisplay, VisionToolbar, SessionTable, DetectionModal, AuthModal
             ├── api/videoApi.ts            # REST client & WebSocket helper
             └── types.ts                   # TypeScript interfaces and telemetry models
 ```
@@ -242,22 +242,33 @@ cd "TASK 2 (FAQ CHATBOT AI)\backend"
 
 ---
 
-## 🎯 Task 4: TrackOptic AI (Real-Time Vision & Tracking)
+## 🎯 Task 4: TrackOptic AI (Precision Vision & Multi-Object Tracking)
 
-**TrackOptic AI** is a high-performance computer vision web application built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal, reddish design system featuring seamless **Light & Dark Mode** switching.
+**TrackOptic AI** is a state-of-the-art computer vision platform built with **FastAPI**, **Ultralytics YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal, reddish design system featuring an **Executive Landing Page**, **Command Center View**, **Kalman Motion Trails**, **Virtual Laser Tripwire Flow Counter**, **Multi-Spectrum Optical Filters**, and seamless **Light & Dark Mode** switching.
 
 ### ✨ Key Features
 
+- 🚀 **Executive Landing Page & Hero Showcase**: High-tech landing experience highlighting features, stats, architecture, and a 1-click transition to the live vision console.
 - 🎨 **TrackOptic AI Vector Branding**: Custom SVG optical reticle target logo with adaptive light/dark appearance.
 - 🌓 **Instant Light & Dark Mode**: Persistent theme toggle with deep slate and reddish glow dark mode palette.
+- 〰️ **Kalman Motion Trajectory Trails**: Centroid motion polylines tracking up to 24 historical points behind objects, visually demonstrating velocity vectors and Kalman motion continuity.
+- ⚡ **Virtual Laser Tripwire & Bidirectional Flow Counter**: Interactive laser line projected across the viewport with real-time crossing math (`⬆️ IN` / `⬇️ OUT` / `Total`), live HUD counters, and 1-click reset.
+- 👁️ **Multi-Spectrum Optical Vision Filters**: Instant GPU-accelerated client canvas filters:
+  - **Optical (RGB)**: Native color spectrum
+  - **Thermal IR (FLIR)**: High-contrast heat signature simulation with amber/cyan spectrum mapping
+  - **Night Vision (NVG)**: Military-grade tactical green phosphor night-vision shader
+- 🎯 **Precision Classification & Tracking Engine**:
+  - **YOLOv8s (Precision)** & **YOLOv8n (Fast)** model selection
+  - **Strict Class-Consistent SORT**: Tracks only associate with detections of the exact same class ($IoU = 0.0$ for differing classes), completely preventing label switching
+  - **10-Frame Confidence-Weighted Temporal Voting**: Eliminates transient classification flickering
+  - **Spatial Containment Filter**: Eliminates phantom duplicate boxes enclosed inside larger detections
+  - **Workplace/Indoor Category Filter**: Focuses detection on office/workspace objects while filtering irrelevant COCO outdoor classes
 - 🔐 **JWT User Authentication & Session Ownership**: Secure password hashing with bcrypt, JWT bearer tokens, 1-click Demo Analyst mode, user profile badge, and "My Sessions" vs "All Sessions" audit view.
 - 🎛️ **Dynamic Vision Control Toolbar**: Real-time confidence and IoU overlap sliders that adjust inference parameters on the fly via WebSocket without restarting the stream.
 - 🎯 **Tactical Targeting Reticle**: Military-grade holographic crosshair overlay with corner brackets and millimeter tick marks.
 - 📸 **1-Click High-Res Snapshot**: Instant PNG capture of the currently tracked frame with bounding boxes and track badges.
 - 🔊 **Target Lock Audio Alerts**: Interactive web audio chimes when high-confidence targets are acquired.
 - 📹 **Dual-Mode Video Input**: Real-time live webcam processing or short video file upload (MP4, AVI, MOV, WEBM).
-- 🧠 **YOLOv8 Deep Learning Detection**: Pre-trained on 80 COCO classes with real-time bounding box and confidence score generation.
-- 🎯 **SORT Multi-Object Tracking**: Kalman filter motion estimation and Hungarian IoU assignment for persistent, consistent track IDs across frames.
 - 📊 **Live Class Distribution & Latency HUD**: Dynamic pill tags showing detected object categories and inference time in milliseconds.
 - 💾 **Telemetry Audit & Instant Exports**: Export session metrics and detection tracks directly to CSV and JSON with 1 click.
 - ⚡ **WebSocket Streaming**: Full-duplex WebSocket connection streaming base64 JPEG frames alongside live FPS, latency, detection count, and track count.
