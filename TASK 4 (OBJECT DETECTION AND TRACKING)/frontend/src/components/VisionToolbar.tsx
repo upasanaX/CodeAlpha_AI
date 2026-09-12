@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sliders, Camera, Maximize2, Grid, Volume2, VolumeX, Sparkles, Gauge, Filter, Cpu } from 'lucide-react';
+import { Sliders, Camera, Maximize2, Grid, Volume2, VolumeX, Sparkles, Gauge, Filter, Cpu, Eye, Activity, Zap } from 'lucide-react';
 
 interface VisionToolbarProps {
   confThreshold: number;
@@ -10,6 +10,12 @@ interface VisionToolbarProps {
   onClassFilterChange: (filter: string) => void;
   modelName: string;
   onModelNameChange: (model: string) => void;
+  showTrails: boolean;
+  onToggleTrails: () => void;
+  isTripwire: boolean;
+  onToggleTripwire: () => void;
+  spectrumMode: 'optical' | 'thermal' | 'nightvision';
+  onSpectrumChange: (mode: 'optical' | 'thermal' | 'nightvision') => void;
   classDistribution: Record<string, number>;
   inferenceMs: number;
   resolution?: string;
@@ -31,6 +37,12 @@ export const VisionToolbar: React.FC<VisionToolbarProps> = ({
   onClassFilterChange,
   modelName,
   onModelNameChange,
+  showTrails,
+  onToggleTrails,
+  isTripwire,
+  onToggleTripwire,
+  spectrumMode,
+  onSpectrumChange,
   classDistribution,
   inferenceMs,
   resolution = "640x480",
@@ -149,6 +161,49 @@ export const VisionToolbar: React.FC<VisionToolbarProps> = ({
               {(iouThreshold * 100).toFixed(0)}%
             </span>
           </div>
+
+          {/* Spectrum Filter Switcher */}
+          <div className="flex items-center space-x-1.5 bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 px-2 py-1.5 rounded-md">
+            <Eye className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 shrink-0" />
+            <select
+              value={spectrumMode}
+              onChange={(e) => onSpectrumChange(e.target.value as 'optical' | 'thermal' | 'nightvision')}
+              className="bg-transparent border-none text-[11px] font-semibold text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer pr-1"
+              title="Select Optical Filter Spectrum"
+            >
+              <option value="optical" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">Optical (RGB)</option>
+              <option value="thermal" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">Thermal IR (FLIR)</option>
+              <option value="nightvision" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">Night Vision (NVG)</option>
+            </select>
+          </div>
+
+          {/* Motion Trails Toggle Button */}
+          <button
+            onClick={onToggleTrails}
+            title={showTrails ? "Kalman Motion Trails Active" : "Enable Kalman Motion Trails"}
+            className={`flex items-center space-x-1 px-2 py-1.5 rounded-md border text-[11px] font-semibold transition-colors shadow-2xs ${
+              showTrails
+                ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 border-brand-300 dark:border-brand-800'
+                : 'bg-white dark:bg-[#161c28] text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border-gray-200 dark:border-gray-700'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Trails</span>
+          </button>
+
+          {/* Virtual Tripwire Toggle Button */}
+          <button
+            onClick={onToggleTripwire}
+            title={isTripwire ? "Virtual Tripwire Active" : "Enable Virtual Tripwire Flow Counter"}
+            className={`flex items-center space-x-1 px-2 py-1.5 rounded-md border text-[11px] font-semibold transition-colors shadow-2xs ${
+              isTripwire
+                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-800 ring-1 ring-amber-400/30'
+                : 'bg-white dark:bg-[#161c28] text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border-gray-200 dark:border-gray-700'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            <span className="hidden sm:inline">Tripwire</span>
+          </button>
 
           {/* Tactical Grid Overlay Toggle */}
           <button

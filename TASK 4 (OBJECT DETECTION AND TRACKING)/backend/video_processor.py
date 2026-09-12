@@ -28,7 +28,13 @@ class VideoProcessor:
             min_hits=config.MIN_HITS,
             iou_threshold=iou_threshold
         )
-        self.class_filter: str = "all"
+        self.class_filter: str = "workplace"
+        self.show_trails: bool = True
+        self.track_trails: Dict[int, List[Tuple[int, int]]] = {}
+        self.is_tripwire: bool = False
+        self.tripwire_y: float = 0.52
+        self.tripwire_in: int = 0
+        self.tripwire_out: int = 0
         self.is_running = True
         self.frame_count = 0
         self.start_time = time.time()
@@ -39,9 +45,12 @@ class VideoProcessor:
         conf: Optional[float] = None,
         iou: Optional[float] = None,
         class_filter: Optional[str] = None,
-        model_name: Optional[str] = None
+        model_name: Optional[str] = None,
+        show_trails: Optional[bool] = None,
+        is_tripwire: Optional[bool] = None,
+        reset_tripwire: Optional[bool] = None
     ):
-        """Update detection, tracking, filter mode, and model on the fly."""
+        """Update detection, tracking, filter mode, model, motion trails, and tripwire on the fly."""
         if conf is not None:
             self.conf_threshold = max(0.05, min(0.95, conf))
         if iou is not None:
@@ -51,7 +60,14 @@ class VideoProcessor:
             self.detector.set_class_filter(class_filter)
         if model_name is not None and model_name in ("yolov8n.pt", "yolov8s.pt"):
             self.detector.set_model(model_name)
-        print(f"[VideoProcessor] Updated settings for session {self.session_id}: conf={self.conf_threshold}, iou={self.tracker.iou_threshold}, filter={self.class_filter}, model={self.detector.model_name}")
+        if show_trails is not None:
+            self.show_trails = show_trails
+        if is_tripwire is not None:
+            self.is_tripwire = is_tripwire
+        if reset_tripwire:
+            self.tripwire_in = 0
+            self.tripwire_out = 0
+        print(f"[VideoProcessor] Settings session {self.session_id}: conf={self.conf_threshold}, iou={self.tracker.iou_threshold}, filter={self.class_filter}, trails={self.show_trails}, tripwire={self.is_tripwire}")
 
     def stop(self):
         """Signal processor loop to stop."""
@@ -66,12 +82,68 @@ class VideoProcessor:
         inference_ms: float
     ) -> np.ndarray:
         """
-        Draw bounding boxes, labels, track IDs, and HUD telemetry onto the frame.
+        Draw bounding boxes, labels, track IDs, motion trails, tripwire, and HUD telemetry onto the frame.
         """
         annotated = frame.copy()
         h, w, _ = annotated.shape
+        active_ids = set()
 
-        # Draw tracked objects
+        # Update centroid trajectory history & check tripwire crossings
+        for obj in tracked_objects:
+            active_ids.add(obj.track_id)
+            x1, y1, x2, y2 = obj.bbox
+            cx = int((x1 + x2) / 2)
+            cy = int((y1 + y2) / 2)
+
+            if obj.track_id not in self.track_trails:
+                self.track_trails[obj.track_id] = []
+
+            # Check tripwire crossing
+            if self.is_tripwire and len(self.track_trails[obj.track_id]) > 0:
+                prev_cx, prev_cy = self.track_trails[obj.track_id][-1]
+                trip_pixel_y = int(h * self.tripwire_y)
+                if prev_cy < trip_pixel_y <= cy:
+                    self.tripwire_in += 1
+                elif prev_cy > trip_pixel_y >= cy:
+                    self.tripwire_out += 1
+
+            self.track_trails[obj.track_id].append((cx, cy))
+            if len(self.track_trails[obj.track_id]) > 25:
+                self.track_trails[obj.track_id].pop(0)
+
+        # Cleanup expired track trails
+        self.track_trails = {tid: pts for tid, pts in self.track_trails.items() if tid in active_ids}
+
+        # Draw Virtual Tripwire line if enabled
+        if self.is_tripwire:
+            trip_pixel_y = int(h * self.tripwire_y)
+            # Laser tripwire line with dashed effect
+            cv2.line(annotated, (0, trip_pixel_y), (w, trip_pixel_y), (255, 200, 0), 2, lineType=cv2.LINE_AA)
+            cv2.putText(
+                annotated,
+                "VIRTUAL TRIPWIRE LINE",
+                (16, trip_pixel_y - 8),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.40,
+                (255, 200, 0),
+                1,
+                lineType=cv2.LINE_AA
+            )
+            # Tripwire flow HUD pill (top-right)
+            cv2.rectangle(annotated, (w - 260, 8), (w - 8, 36), (15, 18, 24), -1)
+            cv2.rectangle(annotated, (w - 260, 8), (w - 8, 36), (255, 200, 0), 1)
+            cv2.putText(
+                annotated,
+                f"FLOW: IN {self.tripwire_in} | OUT {self.tripwire_out}",
+                (w - 245, 26),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.44,
+                (255, 230, 100),
+                1,
+                lineType=cv2.LINE_AA
+            )
+
+        # Draw tracked objects and their motion trajectory ribbons
         for obj in tracked_objects:
             x1, y1, x2, y2 = obj.bbox
 
@@ -84,6 +156,14 @@ class VideoProcessor:
                 continue
 
             color = get_track_color(obj.track_id)
+
+            # Draw Motion Trajectory Ribbon if enabled
+            if self.show_trails and obj.track_id in self.track_trails:
+                pts = np.array(self.track_trails[obj.track_id], dtype=np.int32).reshape((-1, 1, 2))
+                if len(pts) > 1:
+                    cv2.polylines(annotated, [pts], isClosed=False, color=color, thickness=2, lineType=cv2.LINE_AA)
+                    cx, cy = self.track_trails[obj.track_id][-1]
+                    cv2.circle(annotated, (cx, cy), 3, (255, 255, 255), -1, lineType=cv2.LINE_AA)
 
             # Draw bounding box
             cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
@@ -193,7 +273,18 @@ class VideoProcessor:
                     iou = data.get("iou_threshold")
                     class_filter = data.get("class_filter")
                     model_name = data.get("model_name")
-                    self.set_thresholds(conf, iou, class_filter, model_name)
+                    show_trails = data.get("show_trails")
+                    is_tripwire = data.get("is_tripwire")
+                    reset_tripwire = data.get("reset_tripwire")
+                    self.set_thresholds(
+                        conf=conf,
+                        iou=iou,
+                        class_filter=class_filter,
+                        model_name=model_name,
+                        show_trails=show_trails,
+                        is_tripwire=is_tripwire,
+                        reset_tripwire=reset_tripwire
+                    )
                 elif action == "stop":
                     self.stop()
                     break
@@ -280,7 +371,12 @@ class VideoProcessor:
                     "tracks_count": len(tracked_objects),
                     "frame_index": self.frame_count,
                     "class_distribution": class_dist,
-                    "resolution": f"{frame.shape[1]}x{frame.shape[0]}"
+                    "resolution": f"{frame.shape[1]}x{frame.shape[0]}",
+                    "tripwire_counts": {
+                        "in": self.tripwire_in,
+                        "out": self.tripwire_out,
+                        "total": self.tripwire_in + self.tripwire_out
+                    }
                 }
                 await websocket.send_json(payload)
                 await asyncio.sleep(0.005)
@@ -371,7 +467,12 @@ class VideoProcessor:
                     "tracks_count": len(tracked_objects),
                     "frame_index": self.frame_count,
                     "class_distribution": class_dist,
-                    "resolution": f"{frame.shape[1]}x{frame.shape[0]}"
+                    "resolution": f"{frame.shape[1]}x{frame.shape[0]}",
+                    "tripwire_counts": {
+                        "in": self.tripwire_in,
+                        "out": self.tripwire_out,
+                        "total": self.tripwire_in + self.tripwire_out
+                    }
                 }
                 await websocket.send_json(payload)
 

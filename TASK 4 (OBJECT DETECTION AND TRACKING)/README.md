@@ -7,13 +7,16 @@ A production-quality full-stack AI web application for real-time multi-object de
 ## 📌 Project Overview
 
 **TrackOptic AI** was developed as part of **Task 4: Object Detection & Tracking** for the **CodeAlpha AI Internship**. It provides an advanced real-time computer vision pipeline that:
-1. Detects objects across 80 COCO classes using a pre-trained **YOLOv8** model.
-2. Tracks objects continuously across frames using the **SORT** algorithm, associating detections with Kalman-filtered bounding box trajectories and assigning unique, persistent tracking IDs.
-3. Renders bounding boxes, class labels, confidence scores, and consistent color-coded track IDs on each frame.
-4. Streams annotated video in real-time over **WebSocket** alongside telemetry (FPS, latency in ms, detected objects, active tracks, class distribution).
-5. **Interactive Vision Command Center**: Live interactive confidence and IoU sensitivity sliders, tactical targeting reticle overlay, audio target chime toggle, 1-click snapshot capture (PNG), and fullscreen viewport.
-6. **JWT User Authentication & Session Ownership**: Secure password hashing with bcrypt, access tokens, 1-click Demo Analyst mode, user profile pill, and author-tagged session history.
-7. **Telemetry Exports**: 1-click session audit export to **CSV** and **JSON**, plus detailed detection record explorer.
+1. Detects objects across 80 COCO classes using pre-trained **YOLOv8s** (Precision) and **YOLOv8n** (Speed) models with workplace/indoor filtering presets.
+2. Tracks objects continuously across frames using **SORT** enhanced with **strict class-consistent IoU association** and **10-frame confidence-weighted temporal voting** to prevent identity switches and classification flickering.
+3. **Kalman Motion Trajectory Trails**: Dynamic centroid ribbons rendered behind tracked targets to visualize velocity, vector direction, and Kalman motion continuity.
+4. **Virtual Laser Tripwire & Flow Counter**: Interactive tripwire line across viewport with automatic crossing detection, bidirectional flow tracking (`⬆️ IN` / `⬇️ OUT` / `Total`), live HUD counters, and instant reset.
+5. **Multi-Spectrum Optical Vision Filters**: Instant client-side shaders for **Optical (RGB)**, **FLIR Thermal Heatmap (IR)**, and **Tactical Night Vision (NVG)**.
+6. Renders bounding boxes, class labels, confidence scores, and consistent color-coded track IDs on each frame.
+7. Streams annotated video in real-time over **WebSocket** alongside telemetry (FPS, latency in ms, detected objects, active tracks, class distribution, tripwire counts).
+8. **Interactive Vision Command Center**: Live interactive confidence and IoU sensitivity sliders, tactical targeting reticle overlay, audio target chime toggle, 1-click snapshot capture (PNG), and fullscreen viewport.
+9. **JWT User Authentication & Session Ownership**: Secure password hashing with bcrypt, access tokens, 1-click Demo Analyst mode, user profile pill, and author-tagged session history.
+10. **Telemetry Exports**: 1-click session audit export to **CSV** and **JSON**, plus detailed detection record explorer.
 
 ---
 

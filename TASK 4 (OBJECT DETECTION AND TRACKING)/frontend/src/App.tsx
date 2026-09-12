@@ -64,6 +64,12 @@ export const App: React.FC = () => {
   const [isGridOverlay, setIsGridOverlay] = useState<boolean>(false);
   const [isAudioAlert, setIsAudioAlert] = useState<boolean>(false);
 
+  // Advanced Computer Vision Features
+  const [showTrails, setShowTrails] = useState<boolean>(true);
+  const [isTripwire, setIsTripwire] = useState<boolean>(false);
+  const [spectrumMode, setSpectrumMode] = useState<'optical' | 'thermal' | 'nightvision'>('optical');
+  const [tripwireCounts, setTripwireCounts] = useState<{ in: number; out: number; total: number }>({ in: 0, out: 0, total: 0 });
+
   // Sessions & Telemetry
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState<boolean>(false);
@@ -134,6 +140,7 @@ export const App: React.FC = () => {
     setObjectsCount(0);
     setTracksCount(0);
     setClassDistribution({});
+    setTripwireCounts({ in: 0, out: 0, total: 0 });
     prevTrackCountRef.current = 0;
     videoApi.stopProcessing().catch(() => {});
     setTimeout(() => {
@@ -167,6 +174,16 @@ export const App: React.FC = () => {
 
     ws.onopen = () => {
       console.log(`[WebSocket] Connected to ${wsUrl}`);
+      // Send initial feature states to backend processor
+      ws.send(JSON.stringify({
+        action: 'set_thresholds',
+        conf_threshold: confThreshold,
+        iou_threshold: iouThreshold,
+        class_filter: classFilter,
+        model_name: modelName,
+        show_trails: showTrails,
+        is_tripwire: isTripwire
+      }));
     };
 
     ws.onmessage = (event) => {
@@ -187,6 +204,7 @@ export const App: React.FC = () => {
           }
           if (payload.class_distribution) setClassDistribution(payload.class_distribution);
           if (payload.resolution) setResolution(payload.resolution);
+          if (payload.tripwire_counts) setTripwireCounts(payload.tripwire_counts);
         } else if (payload.type === 'finished') {
           console.log('[WebSocket] Video stream completed');
           stopStream();
@@ -209,16 +227,20 @@ export const App: React.FC = () => {
       setIsRunning(false);
       setActiveSource(null);
     };
-  }, [cameraIndex, confThreshold, iouThreshold, playTargetLockAudio, stopStream]);
+  }, [cameraIndex, confThreshold, iouThreshold, classFilter, modelName, showTrails, isTripwire, playTargetLockAudio, stopStream]);
 
-  // Real-time threshold adjustment over WebSocket
+  // Real-time threshold & feature adjustment over WebSocket
   const handleConfChange = (newVal: number) => {
     setConfThreshold(newVal);
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
         action: 'set_thresholds',
         conf_threshold: newVal,
-        iou_threshold: iouThreshold
+        iou_threshold: iouThreshold,
+        class_filter: classFilter,
+        model_name: modelName,
+        show_trails: showTrails,
+        is_tripwire: isTripwire
       }));
     }
   };
@@ -231,7 +253,9 @@ export const App: React.FC = () => {
         conf_threshold: confThreshold,
         iou_threshold: newVal,
         class_filter: classFilter,
-        model_name: modelName
+        model_name: modelName,
+        show_trails: showTrails,
+        is_tripwire: isTripwire
       }));
     }
   };
@@ -244,7 +268,9 @@ export const App: React.FC = () => {
         conf_threshold: confThreshold,
         iou_threshold: iouThreshold,
         class_filter: newFilter,
-        model_name: modelName
+        model_name: modelName,
+        show_trails: showTrails,
+        is_tripwire: isTripwire
       }));
     }
   };
@@ -257,7 +283,57 @@ export const App: React.FC = () => {
         conf_threshold: confThreshold,
         iou_threshold: iouThreshold,
         class_filter: classFilter,
-        model_name: newModel
+        model_name: newModel,
+        show_trails: showTrails,
+        is_tripwire: isTripwire
+      }));
+    }
+  };
+
+  const handleToggleTrails = () => {
+    const nextVal = !showTrails;
+    setShowTrails(nextVal);
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'set_thresholds',
+        conf_threshold: confThreshold,
+        iou_threshold: iouThreshold,
+        class_filter: classFilter,
+        model_name: modelName,
+        show_trails: nextVal,
+        is_tripwire: isTripwire
+      }));
+    }
+  };
+
+  const handleToggleTripwire = () => {
+    const nextVal = !isTripwire;
+    setIsTripwire(nextVal);
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'set_thresholds',
+        conf_threshold: confThreshold,
+        iou_threshold: iouThreshold,
+        class_filter: classFilter,
+        model_name: modelName,
+        show_trails: showTrails,
+        is_tripwire: nextVal
+      }));
+    }
+  };
+
+  const handleResetTripwire = () => {
+    setTripwireCounts({ in: 0, out: 0, total: 0 });
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'set_thresholds',
+        conf_threshold: confThreshold,
+        iou_threshold: iouThreshold,
+        class_filter: classFilter,
+        model_name: modelName,
+        show_trails: showTrails,
+        is_tripwire: isTripwire,
+        reset_tripwire: true
       }));
     }
   };
@@ -381,6 +457,12 @@ export const App: React.FC = () => {
             onClassFilterChange={handleClassFilterChange}
             modelName={modelName}
             onModelNameChange={handleModelNameChange}
+            showTrails={showTrails}
+            onToggleTrails={handleToggleTrails}
+            isTripwire={isTripwire}
+            onToggleTripwire={handleToggleTripwire}
+            spectrumMode={spectrumMode}
+            onSpectrumChange={setSpectrumMode}
             classDistribution={classDistribution}
             inferenceMs={inferenceMs}
             resolution={resolution}
@@ -403,6 +485,10 @@ export const App: React.FC = () => {
             objectsCount={objectsCount}
             tracksCount={tracksCount}
             isGridOverlay={isGridOverlay}
+            spectrumMode={spectrumMode}
+            tripwireCounts={tripwireCounts}
+            isTripwireActive={isTripwire}
+            onResetTripwire={handleResetTripwire}
             errorMessage={errorMessage}
             onDismissError={() => setErrorMessage(null)}
           />

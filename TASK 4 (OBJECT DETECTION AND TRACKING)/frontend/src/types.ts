@@ -48,6 +48,7 @@ export interface FramePayload {
   frame_index?: number;
   class_distribution?: Record<string, number>;
   resolution?: string;
+  tripwire_counts?: { in: number; out: number; total: number };
   message?: string;
 }
 

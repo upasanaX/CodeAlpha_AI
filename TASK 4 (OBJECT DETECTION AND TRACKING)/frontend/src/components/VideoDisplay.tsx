@@ -9,6 +9,10 @@ interface VideoDisplayProps {
   objectsCount: number;
   tracksCount: number;
   isGridOverlay: boolean;
+  spectrumMode?: 'optical' | 'thermal' | 'nightvision';
+  tripwireCounts?: { in: number; out: number; total: number };
+  isTripwireActive?: boolean;
+  onResetTripwire?: () => void;
   errorMessage: string | null;
   onDismissError: () => void;
 }
@@ -26,6 +30,10 @@ export const VideoDisplay = forwardRef<VideoDisplayHandle, VideoDisplayProps>(({
   objectsCount,
   tracksCount,
   isGridOverlay,
+  spectrumMode = 'optical',
+  tripwireCounts = { in: 0, out: 0, total: 0 },
+  isTripwireActive = false,
+  onResetTripwire,
   errorMessage,
   onDismissError
 }, ref) => {
@@ -149,7 +157,15 @@ export const VideoDisplay = forwardRef<VideoDisplayHandle, VideoDisplayProps>(({
           <>
             <canvas
               ref={canvasRef}
-              className="max-w-full max-h-full w-auto h-auto object-contain"
+              style={{
+                filter:
+                  spectrumMode === 'thermal'
+                    ? 'invert(100%) hue-rotate(180deg) saturate(240%) contrast(150%)'
+                    : spectrumMode === 'nightvision'
+                    ? 'sepia(100%) hue-rotate(85deg) saturate(350%) contrast(140%) brightness(95%)'
+                    : 'none'
+              }}
+              className="max-w-full max-h-full w-auto h-auto object-contain transition-[filter] duration-300"
             />
 
             {/* In-Viewport HUD Badge (Top-Right) */}
@@ -171,6 +187,54 @@ export const VideoDisplay = forwardRef<VideoDisplayHandle, VideoDisplayProps>(({
                 </div>
               </div>
             </div>
+
+            {/* Spectrum Mode Status Pill (Top-Left) */}
+            {spectrumMode !== 'optical' && (
+              <div className="absolute top-3 left-3 z-10">
+                <div className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-bold tracking-wider uppercase border shadow-md flex items-center space-x-1.5 ${
+                  spectrumMode === 'thermal'
+                    ? 'bg-amber-950/80 text-amber-300 border-amber-600/80 animate-pulse'
+                    : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/80'
+                }`}>
+                  <span className="w-2 h-2 rounded-full bg-current animate-ping" />
+                  <span>{spectrumMode === 'thermal' ? 'FLIR Thermal IR Active' : 'Tactical Night Vision'}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Virtual Tripwire Flow Counter Banner (Bottom-Left) */}
+            {isTripwireActive && (
+              <div className="absolute bottom-3 left-3 z-10 flex items-center space-x-2">
+                <div className="bg-black/85 backdrop-blur-sm border border-amber-500/80 text-white rounded-md px-3 py-1.5 text-xs font-mono shadow-lg flex items-center space-x-3">
+                  <div className="flex items-center space-x-1 text-amber-400 font-bold">
+                    <span>⚡ TRIPWIRE:</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">⬆️ IN:</span>
+                    <span className="font-bold text-emerald-400">{tripwireCounts.in}</span>
+                  </div>
+                  <div className="w-px h-3 bg-gray-700" />
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">⬇️ OUT:</span>
+                    <span className="font-bold text-rose-400">{tripwireCounts.out}</span>
+                  </div>
+                  <div className="w-px h-3 bg-gray-700" />
+                  <div className="flex items-center space-x-1">
+                    <span className="text-gray-400">Total:</span>
+                    <span className="font-bold text-amber-300">{tripwireCounts.total}</span>
+                  </div>
+                  {onResetTripwire && (
+                    <button
+                      onClick={onResetTripwire}
+                      className="ml-2 px-2 py-0.5 text-[10px] rounded bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-600 transition-colors pointer-events-auto"
+                      title="Reset tripwire counters"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </>
         ) : (
           /* Standby / Inactive Placeholder */
