@@ -1,0 +1,25 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+*.sqlite3
+yolov8n.pt
+
+# Uploads (keep directory)
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/sample_test.mp4
+
+# Node & Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.local
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

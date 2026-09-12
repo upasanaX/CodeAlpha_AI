@@ -20,8 +20,9 @@ This repository showcases production-ready, full-stack AI web applications built
 
 - 🌐 **Task 1: LinguoFlow PRO ✨ (AI Language Translation)**: A feature-rich multilingual translation suite built with Flask, deep-translator, Web Speech API dictation (STT), high-fidelity speech synthesis (TTS), tone and personality variations, and persistent cloud history sync.
 - 🤖 **Task 2: Coursemate AI Assistant 🎓 (Intelligent FAQ Chatbot)**: A full-stack FAQ chatbot application built for an online learning academy utilizing an NLTK NLP preprocessing pipeline (lowercasing, punctuation stripping, tokenization, stopword removal, WordNet lemmatization), Scikit-learn TF-IDF vectorization, Cosine Similarity matching, an SQLite knowledge base with 22 curated Q&As, a React + Vite + TypeScript + Tailwind chat UI, and an interactive Knowledge Base Admin panel with live model re-training.
+- 🎯 **Task 4: Real-Time Object Detection & Tracking (YOLOv8 + SORT)**: A production-quality real-time computer vision system featuring Ultralytics YOLOv8 object detection, SORT multi-object tracking (Kalman Filter + Hungarian Algorithm), FastAPI WebSocket frame streaming, SQLite telemetry logging, and a formal reddish React + TypeScript + Tailwind web application with dual-mode webcam and video file processing.
 
-Both projects are completely self-contained in dedicated folders with independent dependencies, automated test suites, responsive user interfaces, and detailed quick-start instructions.
+All projects are completely self-contained in dedicated folders with independent dependencies, automated test suites, responsive user interfaces, and detailed quick-start instructions.
 
 ---
 
@@ -31,6 +32,7 @@ Both projects are completely self-contained in dedicated folders with independen
 |---|---|---|---|---|
 | **Task 1** | **LinguoFlow PRO ✨** | Intelligent Multilingual AI Translation Web App with Voice Dictation, Speech Synthesis, Theme Switching, and Cloud Sync | [`TASK 1(TRANSLATION APP AI)/`](TASK%201(TRANSLATION%20APP%20AI)/) | ✅ Complete & Verified |
 | **Task 2** | **Coursemate AI FAQ Assistant 🤖** | Production-Ready FAQ Chatbot Web App with NLTK Preprocessing, TF-IDF Vectorization, Cosine Similarity & Admin Knowledge Base | [`TASK 2 (FAQ CHATBOT AI)/`](TASK%202%20(FAQ%20CHATBOT%20AI)/) | ✅ Complete & Verified |
+| **Task 4** | **Real-Time Object Detection & Tracking 🎯** | Live Webcam & Video Object Detection (YOLOv8) and Multi-Object Tracking (SORT) with WebSocket Streaming & Reddish UI | [`TASK 4 (OBJECT DETECTION AND TRACKING)/`](TASK%204%20(OBJECT%20DETECTION%20AND%20TRACKING)/) | ✅ Complete & Verified |
 
 ---
 
@@ -121,6 +123,28 @@ CodeAlpha_AI/
             ├── pages/                     # HomePage (Chat UI) & AdminPage (Knowledge Base)
             ├── api/chatApi.ts             # REST client for /api/chat and /api/faqs
             └── types/faq.ts               # TypeScript data models
+│
+└── TASK 4 (OBJECT DETECTION AND TRACKING)/ # 🎯 Task 4 Project Directory
+    ├── README.md                          # Comprehensive Task 4 documentation
+    ├── backend/
+    │   ├── main.py                        # FastAPI server, REST & WebSocket /ws/video
+    │   ├── detector.py                    # YOLOv8 object detector module
+    │   ├── tracker.py                     # SORT multi-object tracking (Kalman + Hungarian)
+    │   ├── video_processor.py             # Frame capture, annotation, FPS & WS streaming
+    │   ├── db.py                          # SQLAlchemy SQLite engine & session setup
+    │   ├── models.py                      # Session and Detection DB & Pydantic models
+    │   ├── config.py                      # Thresholds, model settings, and logging config
+    │   └── requirements.txt               # Backend computer vision dependencies
+    └── frontend/
+        ├── package.json                   # Vite, React, TypeScript, Tailwind CSS, Lucide
+        ├── vite.config.ts                 # Dev server configuration with backend proxy
+        ├── tailwind.config.js             # Formal reddish theme palette setup
+        ├── index.html                     # HTML5 entry point
+        └── src/
+            ├── App.tsx                    # Main viewport, HUD, and session manager
+            ├── components/                # Header, ControlPanel, VideoDisplay, SessionTable, DetectionModal
+            ├── api/videoApi.ts            # REST client & WebSocket helper
+            └── types.ts                   # TypeScript interfaces and telemetry models
 ```
 
 ---
@@ -218,6 +242,42 @@ cd "TASK 2 (FAQ CHATBOT AI)\backend"
 
 ---
 
+## 🎯 Task 4: Real-Time Object Detection & Tracking (YOLOv8 + SORT)
+
+**Task 4** is a high-performance computer vision web application built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal, reddish design system.
+
+### ✨ Key Features
+
+- 📹 **Dual-Mode Video Input**: Real-time live webcam processing or short video file upload (MP4, AVI, MOV, WEBM).
+- 🧠 **YOLOv8 Deep Learning Detection**: Pre-trained on 80 COCO classes with real-time bounding box and confidence score generation.
+- 🎯 **SORT Multi-Object Tracking**: Kalman filter motion estimation and Hungarian IoU assignment for persistent, consistent track IDs across frames.
+- 🎨 **Visual Annotations & Overlays**: Bounding boxes with consistent track colors, confidence badges, embedded frame HUD, and real-time telemetry pill.
+- ⚡ **WebSocket Streaming**: Full-duplex WebSocket connection streaming base64 JPEG frames alongside live FPS, detection count, and track count.
+- 🗄️ **SQLite Telemetry Logging**: Automatically tracks session metadata and throttled detection logs with interactive audit viewer.
+
+### 🚀 Quick Start Guide (Task 4)
+
+#### 1. Start the Backend:
+```powershell
+cd "TASK 4 (OBJECT DETECTION AND TRACKING)\backend"
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python -c "from db import init_db; init_db()"
+uvicorn main:app --reload --port 8000
+```
+
+#### 2. Start the Frontend:
+```powershell
+cd "TASK 4 (OBJECT DETECTION AND TRACKING)\frontend"
+npm install
+npm run dev
+```
+
+Open your browser at **[http://localhost:5173](http://localhost:5173)**.
+
+---
+
 ## 🛠️ Technologies Used
 
 ### Task 1: LinguoFlow PRO (AI Translation)
@@ -233,6 +293,12 @@ cd "TASK 2 (FAQ CHATBOT AI)\backend"
 - **Database**: SQLite 3 (persistent knowledge base with automatic seeding)
 - **Frontend**: React 18, Vite 5, TypeScript 5, Tailwind CSS 3, Lucide React icons
 - **Testing**: `pytest`, `httpx`, `TestClient`
+
+### Task 4: Real-Time Object Detection & Tracking
+- **Backend**: Python 3.11, FastAPI, WebSockets, OpenCV (`cv2`), SQLAlchemy, Pydantic v2, Uvicorn
+- **Computer Vision & Tracking**: Ultralytics `YOLOv8n`, PyTorch, TorchVision, SciPy (`linear_sum_assignment`), NumPy
+- **Frontend**: React 18, Vite 5, TypeScript 5, Tailwind CSS 3 (Reddish Theme), HTML5 Canvas, Lucide React
+- **Database**: SQLite 3 (`sessions` and `detections` tables)
 
 ---
 
