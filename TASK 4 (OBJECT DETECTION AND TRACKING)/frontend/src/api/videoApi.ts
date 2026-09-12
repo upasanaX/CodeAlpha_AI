@@ -154,8 +154,10 @@ export const videoApi = {
     videoId?: string,
     sessionId?: number,
     cameraIndex: number = 0,
-    confThreshold: number = 0.4,
-    iouThreshold: number = 0.3
+    confThreshold: number = 0.50,
+    iouThreshold: number = 0.30,
+    classFilter: string = 'workplace',
+    modelName: string = 'yolov8s.pt'
   ): string {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
@@ -166,6 +168,8 @@ export const videoApi = {
     params.append('camera_index', cameraIndex.toString());
     params.append('conf_threshold', confThreshold.toString());
     params.append('iou_threshold', iouThreshold.toString());
+    params.append('class_filter', classFilter);
+    params.append('model_name', modelName);
 
     const token = this.getToken();
     if (token) params.append('token', token);

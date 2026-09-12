@@ -16,8 +16,8 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 DATABASE_URL = f"sqlite:///{BASE_DIR}/tracking.db"
 
 # Detection & Tracking Model Parameters
-MODEL_NAME = os.getenv("DETECTION_MODEL", "yolov8n.pt")  # Pre-trained YOLOv8 nano model
-CONF_THRESHOLD = float(os.getenv("CONF_THRESHOLD", "0.40"))  # Confidence threshold for detections
+MODEL_NAME = os.getenv("DETECTION_MODEL", "yolov8s.pt")  # High-accuracy YOLOv8 small model
+CONF_THRESHOLD = float(os.getenv("CONF_THRESHOLD", "0.50"))  # Clean confidence threshold (reduces false positives)
 IOU_THRESHOLD = float(os.getenv("IOU_THRESHOLD", "0.30"))   # IoU threshold for SORT tracker
 MAX_AGE = int(os.getenv("MAX_AGE", "30"))                    # Max frames to keep lost track alive
 MIN_HITS = int(os.getenv("MIN_HITS", "3"))                   # Min hits before track is confirmed

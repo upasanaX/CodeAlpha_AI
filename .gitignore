@@ -5,7 +5,9 @@ env/
 **/env/
 **/__pycache__/
 **/*.py[cod]
-*$py.class
+# Machine Learning model weights
+*.pt
+**/*.pt
 
 # Node dependencies & build output
 **/node_modules/

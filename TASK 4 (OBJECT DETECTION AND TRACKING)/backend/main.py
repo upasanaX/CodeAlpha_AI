@@ -80,10 +80,11 @@ def health_check():
     return {
         "status": "healthy",
         "app_name": "TrackOptic AI",
-        "model": config.MODEL_NAME,
+        "model": detector.model_name if detector else config.MODEL_NAME,
         "device": config.DEVICE,
         "conf_threshold": config.CONF_THRESHOLD,
-        "iou_threshold": config.IOU_THRESHOLD
+        "iou_threshold": config.IOU_THRESHOLD,
+        "class_filter": detector.class_filter if detector else "all"
     }
 
 
@@ -351,6 +352,8 @@ async def websocket_video_stream(
     camera_index: int = Query(0),
     conf_threshold: float = Query(config.CONF_THRESHOLD),
     iou_threshold: float = Query(config.IOU_THRESHOLD),
+    class_filter: str = Query("all"),
+    model_name: Optional[str] = Query(None),
     token: Optional[str] = Query(None)
 ):
     """
@@ -358,7 +361,7 @@ async def websocket_video_stream(
     SORT tracking, and dynamic sensitivity controls.
     """
     await websocket.accept()
-    print(f"[WebSocket] Client connected: source_type={source_type}, video_id={video_id}, session_id={session_id}")
+    print(f"[WebSocket] Client connected: source_type={source_type}, video_id={video_id}, session_id={session_id}, filter={class_filter}")
 
     # Determine user from token if supplied
     user_id = None
@@ -389,6 +392,7 @@ async def websocket_video_stream(
         conf_threshold=conf_threshold,
         iou_threshold=iou_threshold
     )
+    processor.set_thresholds(class_filter=class_filter, model_name=model_name)
     active_processors[session_id] = processor
 
     try:

@@ -1,11 +1,15 @@
 import React from 'react';
-import { Sliders, Camera, Maximize2, Grid, Volume2, VolumeX, Sparkles, Gauge } from 'lucide-react';
+import { Sliders, Camera, Maximize2, Grid, Volume2, VolumeX, Sparkles, Gauge, Filter, Cpu } from 'lucide-react';
 
 interface VisionToolbarProps {
   confThreshold: number;
   iouThreshold: number;
   onConfChange: (newVal: number) => void;
   onIouChange: (newVal: number) => void;
+  classFilter: string;
+  onClassFilterChange: (filter: string) => void;
+  modelName: string;
+  onModelNameChange: (model: string) => void;
   classDistribution: Record<string, number>;
   inferenceMs: number;
   resolution?: string;
@@ -23,6 +27,10 @@ export const VisionToolbar: React.FC<VisionToolbarProps> = ({
   iouThreshold,
   onConfChange,
   onIouChange,
+  classFilter,
+  onClassFilterChange,
+  modelName,
+  onModelNameChange,
   classDistribution,
   inferenceMs,
   resolution = "640x480",
@@ -68,7 +76,7 @@ export const VisionToolbar: React.FC<VisionToolbarProps> = ({
         </div>
 
         {/* Right: Quick Action Toggles & Sliders */}
-        <div className="flex flex-wrap items-center gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-2.5 text-xs">
           {/* Hardware Latency Pill */}
           <div className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 font-mono text-gray-600 dark:text-gray-400">
             <Gauge className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
@@ -77,13 +85,41 @@ export const VisionToolbar: React.FC<VisionToolbarProps> = ({
             <span>{resolution}</span>
           </div>
 
+          {/* Model Switcher Selector */}
+          <div className="flex items-center space-x-1.5 bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 px-2 py-1.5 rounded-md">
+            <Cpu className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 shrink-0" />
+            <select
+              value={modelName}
+              onChange={(e) => onModelNameChange(e.target.value)}
+              className="bg-transparent border-none text-[11px] font-semibold text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer pr-1"
+              title="Select YOLOv8 model capacity"
+            >
+              <option value="yolov8s.pt" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">YOLOv8s (Precision)</option>
+              <option value="yolov8n.pt" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">YOLOv8n (Fast)</option>
+            </select>
+          </div>
+
+          {/* Category Filter Preset */}
+          <div className="flex items-center space-x-1.5 bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 px-2 py-1.5 rounded-md">
+            <Filter className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400 shrink-0" />
+            <select
+              value={classFilter}
+              onChange={(e) => onClassFilterChange(e.target.value)}
+              className="bg-transparent border-none text-[11px] font-semibold text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer pr-1"
+              title="Filter target object classes"
+            >
+              <option value="workplace" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">Indoor / Office Focus</option>
+              <option value="all" className="dark:bg-gray-900 text-gray-900 dark:text-gray-100">All 80 Classes</option>
+            </select>
+          </div>
+
           {/* Confidence Slider */}
           <div className="flex items-center space-x-2 bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 px-3 py-1.5 rounded-md">
             <Sliders className="w-3.5 h-3.5 text-gray-400" />
             <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">Conf:</span>
             <input
               type="range"
-              min="0.10"
+              min="0.20"
               max="0.90"
               step="0.05"
               value={confThreshold}
@@ -164,3 +200,5 @@ export const VisionToolbar: React.FC<VisionToolbarProps> = ({
     </div>
   );
 };
+
+export default VisionToolbar;

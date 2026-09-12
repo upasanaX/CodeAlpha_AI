@@ -115,18 +115,29 @@ class KalmanBoxTracker:
         self.hits = 1
         self.hit_streak = 1
         self.age = 0
+        self.class_history: List[Tuple[str, float]] = [(class_name, confidence)]
         self.class_name = class_name
         self.confidence = confidence
 
     def update(self, bbox: Tuple[int, int, int, int], class_name: str, confidence: float):
         """
-        Updates the state vector with observed bbox.
+        Updates the state vector with observed bbox and stabilises classification.
         """
         self.time_since_update = 0
         self.history = []
         self.hits += 1
         self.hit_streak += 1
-        self.class_name = class_name
+
+        # Stabilize classification through temporal confidence-weighted voting
+        self.class_history.append((class_name, confidence))
+        if len(self.class_history) > 10:
+            self.class_history.pop(0)
+
+        scores: dict = {}
+        for c, conf in self.class_history:
+            scores[c] = scores.get(c, 0.0) + conf
+        best_class = max(scores.items(), key=lambda item: item[1])[0]
+        self.class_name = best_class
         self.confidence = confidence
 
         z = convert_bbox_to_z(bbox)
@@ -265,7 +276,11 @@ class SortTracker:
 
         for d, det in enumerate(detections):
             for t, pred_box in enumerate(predicted_boxes):
-                iou_matrix[d, t] = calculate_iou(det.bbox, pred_box)
+                # Enforce class consistency: never match detections with tracks of a different class
+                if det.class_name == self.trackers[t].class_name:
+                    iou_matrix[d, t] = calculate_iou(det.bbox, pred_box)
+                else:
+                    iou_matrix[d, t] = 0.0
 
         # Linear sum assignment (Hungarian algorithm) maximizes IoU (minimizes -IoU)
         if min(iou_matrix.shape) > 0:

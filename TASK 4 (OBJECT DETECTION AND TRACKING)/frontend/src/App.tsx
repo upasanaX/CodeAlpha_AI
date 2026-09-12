@@ -57,8 +57,10 @@ export const App: React.FC = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   // Dynamic Vision Controls
-  const [confThreshold, setConfThreshold] = useState<number>(0.40);
+  const [confThreshold, setConfThreshold] = useState<number>(0.50);
   const [iouThreshold, setIouThreshold] = useState<number>(0.30);
+  const [classFilter, setClassFilter] = useState<string>('workplace');
+  const [modelName, setModelName] = useState<string>('yolov8s.pt');
   const [isGridOverlay, setIsGridOverlay] = useState<boolean>(false);
   const [isAudioAlert, setIsAudioAlert] = useState<boolean>(false);
 
@@ -156,7 +158,9 @@ export const App: React.FC = () => {
       undefined,
       cameraIndex,
       confThreshold,
-      iouThreshold
+      iouThreshold,
+      classFilter,
+      modelName
     );
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -225,7 +229,35 @@ export const App: React.FC = () => {
       wsRef.current.send(JSON.stringify({
         action: 'set_thresholds',
         conf_threshold: confThreshold,
-        iou_threshold: newVal
+        iou_threshold: newVal,
+        class_filter: classFilter,
+        model_name: modelName
+      }));
+    }
+  };
+
+  const handleClassFilterChange = (newFilter: string) => {
+    setClassFilter(newFilter);
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'set_thresholds',
+        conf_threshold: confThreshold,
+        iou_threshold: iouThreshold,
+        class_filter: newFilter,
+        model_name: modelName
+      }));
+    }
+  };
+
+  const handleModelNameChange = (newModel: string) => {
+    setModelName(newModel);
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        action: 'set_thresholds',
+        conf_threshold: confThreshold,
+        iou_threshold: iouThreshold,
+        class_filter: classFilter,
+        model_name: newModel
       }));
     }
   };
@@ -345,6 +377,10 @@ export const App: React.FC = () => {
             iouThreshold={iouThreshold}
             onConfChange={handleConfChange}
             onIouChange={handleIouChange}
+            classFilter={classFilter}
+            onClassFilterChange={handleClassFilterChange}
+            modelName={modelName}
+            onModelNameChange={handleModelNameChange}
             classDistribution={classDistribution}
             inferenceMs={inferenceMs}
             resolution={resolution}

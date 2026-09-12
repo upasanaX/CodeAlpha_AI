@@ -28,18 +28,30 @@ class VideoProcessor:
             min_hits=config.MIN_HITS,
             iou_threshold=iou_threshold
         )
+        self.class_filter: str = "all"
         self.is_running = True
         self.frame_count = 0
         self.start_time = time.time()
         self.logged_detections_count = 0
 
-    def set_thresholds(self, conf: Optional[float] = None, iou: Optional[float] = None):
-        """Update detection and tracking thresholds on the fly."""
+    def set_thresholds(
+        self,
+        conf: Optional[float] = None,
+        iou: Optional[float] = None,
+        class_filter: Optional[str] = None,
+        model_name: Optional[str] = None
+    ):
+        """Update detection, tracking, filter mode, and model on the fly."""
         if conf is not None:
             self.conf_threshold = max(0.05, min(0.95, conf))
         if iou is not None:
             self.tracker.iou_threshold = max(0.05, min(0.95, iou))
-        print(f"[VideoProcessor] Updated thresholds for session {self.session_id}: conf={self.conf_threshold}, iou={self.tracker.iou_threshold}")
+        if class_filter is not None:
+            self.class_filter = class_filter
+            self.detector.set_class_filter(class_filter)
+        if model_name is not None and model_name in ("yolov8n.pt", "yolov8s.pt"):
+            self.detector.set_model(model_name)
+        print(f"[VideoProcessor] Updated settings for session {self.session_id}: conf={self.conf_threshold}, iou={self.tracker.iou_threshold}, filter={self.class_filter}, model={self.detector.model_name}")
 
     def stop(self):
         """Signal processor loop to stop."""
@@ -179,7 +191,9 @@ class VideoProcessor:
                 if action == "set_thresholds":
                     conf = data.get("conf_threshold")
                     iou = data.get("iou_threshold")
-                    self.set_thresholds(conf, iou)
+                    class_filter = data.get("class_filter")
+                    model_name = data.get("model_name")
+                    self.set_thresholds(conf, iou, class_filter, model_name)
                 elif action == "stop":
                     self.stop()
                     break
@@ -231,8 +245,12 @@ class VideoProcessor:
                     scale = 800.0 / frame.shape[1]
                     frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
-                # Detection with dynamic confidence threshold
-                detections, inference_ms = self.detector.detect(frame, conf_threshold=self.conf_threshold)
+                # Detection with dynamic confidence threshold and active class filter
+                detections, inference_ms = self.detector.detect(
+                    frame,
+                    conf_threshold=self.conf_threshold,
+                    filter_mode=self.class_filter
+                )
                 tracked_objects = self.tracker.update(detections)
 
                 # Class breakdown
@@ -323,7 +341,11 @@ class VideoProcessor:
                     scale = 960.0 / frame.shape[1]
                     frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
-                detections, inference_ms = self.detector.detect(frame, conf_threshold=self.conf_threshold)
+                detections, inference_ms = self.detector.detect(
+                    frame,
+                    conf_threshold=self.conf_threshold,
+                    filter_mode=self.class_filter
+                )
                 tracked_objects = self.tracker.update(detections)
 
                 class_dist: Dict[str, int] = {}
