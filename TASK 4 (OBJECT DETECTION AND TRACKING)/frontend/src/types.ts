@@ -1,5 +1,20 @@
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+}
+
 export interface Session {
   id: number;
+  user_id?: number;
+  username?: string;
   created_at: string;
   source_type: 'webcam' | 'file';
   video_filename?: string;
@@ -27,9 +42,12 @@ export interface FramePayload {
   type: 'frame' | 'finished' | 'error';
   frame_data?: string; // base64 JPEG
   fps?: number;
+  inference_ms?: number;
   objects_count?: number;
   tracks_count?: number;
   frame_index?: number;
+  class_distribution?: Record<string, number>;
+  resolution?: string;
   message?: string;
 }
 
@@ -43,6 +61,7 @@ export interface UploadResponse {
 
 export interface HealthResponse {
   status: string;
+  app_name?: string;
   model: string;
   device: string;
   conf_threshold: number;

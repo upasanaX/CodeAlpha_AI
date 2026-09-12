@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Camera, AlertTriangle, MonitorPlay, Zap } from 'lucide-react';
 
 interface VideoDisplayProps {
@@ -8,23 +8,36 @@ interface VideoDisplayProps {
   fps: number;
   objectsCount: number;
   tracksCount: number;
+  isGridOverlay: boolean;
   errorMessage: string | null;
   onDismissError: () => void;
 }
 
-export const VideoDisplay: React.FC<VideoDisplayProps> = ({
+export interface VideoDisplayHandle {
+  getCanvasElement: () => HTMLCanvasElement | null;
+  getContainerElement: () => HTMLDivElement | null;
+}
+
+export const VideoDisplay = forwardRef<VideoDisplayHandle, VideoDisplayProps>(({
   currentFrame,
   isRunning,
   activeSource,
   fps,
   objectsCount,
   tracksCount,
+  isGridOverlay,
   errorMessage,
   onDismissError
-}) => {
+}, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Render base64 frame onto canvas for crisp hardware-accelerated rendering
+  useImperativeHandle(ref, () => ({
+    getCanvasElement: () => canvasRef.current,
+    getContainerElement: () => containerRef.current
+  }));
+
+  // Render base64 frame onto canvas with optional tactical cyber grid
   useEffect(() => {
     if (!currentFrame || !canvasRef.current) return;
 
@@ -39,31 +52,86 @@ export const VideoDisplay: React.FC<VideoDisplayProps> = ({
         canvas.height = img.height;
       }
       ctx.drawImage(img, 0, 0);
+
+      // Render Tactical Target Reticle Overlay if enabled
+      if (isGridOverlay) {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.strokeStyle = 'rgba(220, 38, 38, 0.25)'; // Brand Red with transparency
+        ctx.lineWidth = 1;
+
+        // Center crosshair
+        ctx.beginPath();
+        ctx.moveTo(w / 2, 0);
+        ctx.lineTo(w / 2, h);
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+
+        // Outer focus brackets
+        const bSize = 30;
+        ctx.strokeStyle = 'rgba(220, 38, 38, 0.6)';
+        ctx.lineWidth = 2;
+        // Top-left
+        ctx.beginPath();
+        ctx.moveTo(20, 20 + bSize);
+        ctx.lineTo(20, 20);
+        ctx.lineTo(20 + bSize, 20);
+        // Top-right
+        ctx.moveTo(w - 20 - bSize, 20);
+        ctx.lineTo(w - 20, 20);
+        ctx.lineTo(w - 20, 20 + bSize);
+        // Bottom-left
+        ctx.moveTo(20, h - 20 - bSize);
+        ctx.lineTo(20, h - 20);
+        ctx.lineTo(20 + bSize, h - 20);
+        // Bottom-right
+        ctx.moveTo(w - 20 - bSize, h - 20);
+        ctx.lineTo(w - 20, h - 20);
+        ctx.lineTo(w - 20, h - 20 - bSize);
+        ctx.stroke();
+
+        // Center reticle ring
+        ctx.beginPath();
+        ctx.arc(w / 2, h / 2, 40, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(220, 38, 38, 0.4)';
+        ctx.stroke();
+      }
     };
     img.src = `data:image/jpeg;base64,${currentFrame}`;
-  }, [currentFrame]);
+  }, [currentFrame, isGridOverlay]);
 
   return (
     <div className="bg-white dark:bg-[#111622] border border-gray-200 dark:border-gray-800 rounded-lg shadow-xs p-4 mb-6 transition-colors duration-200">
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center space-x-2">
           <MonitorPlay className="w-4 h-4 text-brand-600 dark:text-brand-400" />
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 tracking-wide uppercase">Live Processing Viewport</h2>
+          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 tracking-wide uppercase flex items-center">
+            <span>Live Vision Feed</span>
+            {isGridOverlay && (
+              <span className="ml-2 text-[10px] font-mono px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                TACTICAL RETICLE ON
+              </span>
+            )}
+          </h2>
         </div>
         <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-          {activeSource === 'webcam' ? 'Source: Real-time Camera' : activeSource === 'file' ? 'Source: Video File Stream' : 'Source: None'}
+          {activeSource === 'webcam' ? 'Source: Real-time Camera' : activeSource === 'file' ? 'Source: Video Stream' : 'Source: Standby'}
         </span>
       </div>
 
       {/* Main Viewport Container */}
-      <div className="relative w-full aspect-video bg-gray-950 dark:bg-black rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 dark:border-gray-900 shadow-inner">
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-video bg-gray-950 dark:bg-black rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 dark:border-gray-900 shadow-inner group"
+      >
         {/* Error Notification Overlay */}
         {errorMessage && (
-          <div className="absolute top-4 left-4 right-4 z-20 bg-red-900/90 backdrop-blur-sm border border-red-500 text-white rounded-md p-3.5 flex items-start justify-between shadow-lg">
+          <div className="absolute top-4 left-4 right-4 z-20 bg-red-900/90 backdrop-blur-sm border border-red-500 text-white rounded-md p-3.5 flex items-start justify-between shadow-lg animate-slideDown">
             <div className="flex items-start space-x-3">
               <AlertTriangle className="w-5 h-5 text-red-300 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-semibold">Video Stream Error</h4>
+                <h4 className="text-sm font-semibold">Vision Pipeline Notice</h4>
                 <p className="text-xs text-red-200 mt-0.5 leading-relaxed">{errorMessage}</p>
               </div>
             </div>
@@ -84,9 +152,9 @@ export const VideoDisplay: React.FC<VideoDisplayProps> = ({
               className="max-w-full max-h-full w-auto h-auto object-contain"
             />
 
-            {/* Minimal In-Viewport HUD Badge (Top-Right) */}
+            {/* In-Viewport HUD Badge (Top-Right) */}
             <div className="absolute top-3 right-3 z-10 flex items-center space-x-2 pointer-events-none">
-              <div className="bg-black/75 backdrop-blur-sm border border-gray-700/80 text-white rounded-md px-3 py-1.5 flex items-center space-x-3 text-xs font-mono shadow-md">
+              <div className="bg-black/75 backdrop-blur-xs border border-gray-700/80 text-white rounded-md px-3 py-1.5 flex items-center space-x-3 text-xs font-mono shadow-md">
                 <div className="flex items-center space-x-1">
                   <Zap className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
                   <span className="font-semibold text-gray-200">{fps.toFixed(1)} FPS</span>
@@ -107,23 +175,33 @@ export const VideoDisplay: React.FC<VideoDisplayProps> = ({
         ) : (
           /* Standby / Inactive Placeholder */
           <div className="flex flex-col items-center justify-center p-8 text-center text-gray-400 max-w-md">
-            <div className="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center mb-4 text-brand-500/80">
-              <Camera className="w-8 h-8 stroke-[1.5]" />
+            <div className="relative mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/60 flex items-center justify-center text-brand-500 shadow-lg">
+                <Camera className="w-8 h-8 stroke-[1.5]" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-brand-600 rounded-full border-2 border-gray-950 flex items-center justify-center">
+                <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+              </div>
             </div>
-            <h3 className="text-base font-semibold text-gray-200 mb-1">No Active Video Stream</h3>
+            <h3 className="text-base font-bold text-gray-200 mb-1">TrackOptic Command Ready</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
-              Click <span className="font-medium text-brand-400">"Start Webcam"</span> to begin live detection & tracking from your camera, or <span className="font-medium text-brand-400">"Upload Video"</span> to track objects in a recorded MP4/AVI clip.
+              Initiate <span className="font-semibold text-brand-400">"Start Webcam"</span> for real-time live sensor tracking, or <span className="font-semibold text-brand-400">"Upload Video"</span> for high-throughput batch detection.
             </p>
-            <div className="flex items-center space-x-4 text-[11px] text-gray-400 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-full font-mono">
-              <span>YOLOv8 Detection</span>
+            <div className="flex items-center space-x-3 text-[11px] text-gray-400 bg-gray-900/80 border border-gray-800 px-3.5 py-1.5 rounded-full font-mono">
+              <span className="flex items-center space-x-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>YOLOv8n</span>
+              </span>
               <span>•</span>
-              <span>SORT Kalman Tracking</span>
+              <span>SORT Kalman</span>
               <span>•</span>
-              <span>WebSocket Stream</span>
+              <span>25 FPS Stream</span>
             </div>
           </div>
         )}
       </div>
     </div>
   );
-};
+});
+
+VideoDisplay.displayName = 'VideoDisplay';

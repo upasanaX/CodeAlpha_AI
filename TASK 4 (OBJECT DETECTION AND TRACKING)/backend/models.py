@@ -1,18 +1,31 @@
 """
-Database and Pydantic models for Object Detection & Tracking.
+Database and Pydantic models for Object Detection & Tracking with User Authentication.
 """
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from db import Base
 
 # SQLAlchemy Models
+class UserModel(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    sessions = relationship("SessionModel", back_populates="user", cascade="all, delete-orphan")
+
+
 class SessionModel(Base):
     __tablename__ = "sessions"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     source_type = Column(String, nullable=False)  # "webcam" or "file"
     video_filename = Column(String, nullable=True)
@@ -20,6 +33,7 @@ class SessionModel(Base):
     total_frames = Column(Integer, default=0)
     notes = Column(String, nullable=True)
 
+    user = relationship("UserModel", back_populates="sessions")
     detections = relationship("DetectionModel", back_populates="session", cascade="all, delete-orphan")
 
 
@@ -42,6 +56,33 @@ class DetectionModel(Base):
 
 
 # Pydantic Schemas
+
+# User Auth Schemas
+class UserRegisterRequest(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email: str = Field(..., min_length=5, max_length=100)
+    password: str = Field(..., min_length=6)
+
+class UserLoginRequest(BaseModel):
+    username_or_email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AuthTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
+
+# Session & Detection Schemas
 class SessionBase(BaseModel):
     source_type: str
     video_filename: Optional[str] = None
@@ -52,6 +93,8 @@ class SessionCreate(SessionBase):
 
 class SessionResponse(SessionBase):
     id: int
+    user_id: Optional[int] = None
+    username: Optional[str] = None
     created_at: datetime
     duration_sec: Optional[float] = 0.0
     total_frames: Optional[int] = 0

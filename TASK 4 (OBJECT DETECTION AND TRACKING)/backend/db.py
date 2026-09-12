@@ -1,7 +1,7 @@
 """
-SQLAlchemy Database setup and session management.
+SQLAlchemy Database setup and session management with SQLite auto-migration.
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from config import DATABASE_URL
 
@@ -23,5 +23,13 @@ def get_db():
         db.close()
 
 def init_db():
-    """Initialize all tables."""
+    """Initialize all tables and migrate columns if needed."""
     Base.metadata.create_all(bind=engine)
+
+    # SQLite migration: add user_id column if upgrading existing database
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE sessions ADD COLUMN user_id INTEGER REFERENCES users(id)"))
+            conn.commit()
+        except Exception:
+            pass  # Column already exists

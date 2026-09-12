@@ -1,11 +1,11 @@
 """
 Video Processor Module for Webcam & Video File streams with real-time detection,
-SORT tracking, frame annotation, and WebSocket transmission.
+SORT tracking, frame annotation, and WebSocket transmission with dynamic thresholding.
 """
 import asyncio
 import base64
 import time
-from typing import Optional, List
+from typing import Optional, List, Dict
 import cv2
 import numpy as np
 from fastapi import WebSocket
@@ -17,20 +17,29 @@ from models import SessionModel, DetectionModel
 from db import SessionLocal
 
 class VideoProcessor:
-    """Manages real-time frame acquisition, processing, and streaming."""
+    """Manages real-time frame acquisition, processing, dynamic thresholding, and streaming."""
 
-    def __init__(self, detector: ObjectDetector, session_id: int):
+    def __init__(self, detector: ObjectDetector, session_id: int, conf_threshold: float = config.CONF_THRESHOLD, iou_threshold: float = config.IOU_THRESHOLD):
         self.detector = detector
         self.session_id = session_id
+        self.conf_threshold = conf_threshold
         self.tracker = SortTracker(
             max_age=config.MAX_AGE,
             min_hits=config.MIN_HITS,
-            iou_threshold=config.IOU_THRESHOLD
+            iou_threshold=iou_threshold
         )
         self.is_running = True
         self.frame_count = 0
         self.start_time = time.time()
         self.logged_detections_count = 0
+
+    def set_thresholds(self, conf: Optional[float] = None, iou: Optional[float] = None):
+        """Update detection and tracking thresholds on the fly."""
+        if conf is not None:
+            self.conf_threshold = max(0.05, min(0.95, conf))
+        if iou is not None:
+            self.tracker.iou_threshold = max(0.05, min(0.95, iou))
+        print(f"[VideoProcessor] Updated thresholds for session {self.session_id}: conf={self.conf_threshold}, iou={self.tracker.iou_threshold}")
 
     def stop(self):
         """Signal processor loop to stop."""
@@ -41,7 +50,8 @@ class VideoProcessor:
         frame: np.ndarray,
         tracked_objects: List[TrackedObject],
         raw_detections: List[DetectionResult],
-        fps: float
+        fps: float,
+        inference_ms: float
     ) -> np.ndarray:
         """
         Draw bounding boxes, labels, track IDs, and HUD telemetry onto the frame.
@@ -53,7 +63,6 @@ class VideoProcessor:
         for obj in tracked_objects:
             x1, y1, x2, y2 = obj.bbox
 
-            # Clamp coordinates to frame boundaries
             x1 = max(0, min(w - 1, x1))
             y1 = max(0, min(h - 1, y1))
             x2 = max(0, min(w - 1, x2))
@@ -70,7 +79,7 @@ class VideoProcessor:
             # Draw label banner
             label = f"ID:{obj.track_id} {obj.class_name} {obj.confidence:.2f}"
             font = cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 0.5
+            font_scale = 0.48
             thickness = 1
             (text_w, text_h), baseline = cv2.getTextSize(label, font, font_scale, thickness)
 
@@ -80,7 +89,7 @@ class VideoProcessor:
             badge_x2 = min(w, x1 + text_w + 8)
             cv2.rectangle(annotated, (x1, badge_y1), (badge_x2, badge_y2), color, -1)
 
-            # Text (white or dark contrasting)
+            # Text
             cv2.putText(
                 annotated,
                 label,
@@ -93,15 +102,15 @@ class VideoProcessor:
             )
 
         # Draw HUD badge in top-left
-        hud_text = f"FPS: {fps:4.1f} | Objects: {len(raw_detections)} | Tracks: {len(tracked_objects)}"
-        cv2.rectangle(annotated, (8, 8), (340, 36), (20, 20, 20), -1)
-        cv2.rectangle(annotated, (8, 8), (340, 36), (50, 50, 200), 1)  # Reddish/wine accent border
+        hud_text = f"FPS: {fps:4.1f} | Latency: {inference_ms:4.1f}ms | Objs: {len(raw_detections)} | Tracks: {len(tracked_objects)}"
+        cv2.rectangle(annotated, (8, 8), (430, 36), (15, 18, 24), -1)
+        cv2.rectangle(annotated, (8, 8), (430, 36), (40, 40, 220), 1)  # Crimson border
         cv2.putText(
             annotated,
             hud_text,
             (16, 26),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.48,
+            0.46,
             (240, 240, 240),
             1,
             lineType=cv2.LINE_AA
@@ -159,19 +168,36 @@ class VideoProcessor:
         finally:
             db.close()
 
+    async def _handle_incoming_messages(self, websocket: WebSocket):
+        """Background listener for live threshold adjustments and commands from client."""
+        try:
+            while self.is_running:
+                data = await websocket.receive_json()
+                if not data:
+                    continue
+                action = data.get("action")
+                if action == "set_thresholds":
+                    conf = data.get("conf_threshold")
+                    iou = data.get("iou_threshold")
+                    self.set_thresholds(conf, iou)
+                elif action == "stop":
+                    self.stop()
+                    break
+        except Exception:
+            pass
+
     async def stream_webcam(self, websocket: WebSocket, camera_index: int = 0):
         """Captures frames from live webcam, runs detection + tracking, and streams via WebSocket."""
         print(f"[VideoProcessor] Opening webcam index {camera_index} for session {self.session_id}...")
         cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW) if hasattr(cv2, "CAP_DSHOW") else cv2.VideoCapture(camera_index)
 
         if not cap.isOpened():
-            # Fallback attempt standard VideoCapture
             cap = cv2.VideoCapture(camera_index)
 
         if not cap.isOpened():
             error_payload = {
                 "type": "error",
-                "message": f"Unable to access camera index {camera_index}. Please ensure a camera is connected and permissions are granted, or test with a video file."
+                "message": f"Unable to access camera index {camera_index}. Please ensure a camera is connected and permissions are granted, or test with an uploaded video."
             }
             await websocket.send_json(error_payload)
             return
@@ -181,6 +207,9 @@ class VideoProcessor:
 
         prev_time = time.time()
         fps = 0.0
+
+        # Start incoming message listener
+        listener_task = asyncio.create_task(self._handle_incoming_messages(websocket))
 
         try:
             while self.is_running:
@@ -198,14 +227,18 @@ class VideoProcessor:
 
                 self.frame_count += 1
 
-                # Resize if needed for snappy throughput
                 if frame.shape[1] > 800:
                     scale = 800.0 / frame.shape[1]
                     frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
-                # Detection & Tracking
-                detections = self.detector.detect(frame)
+                # Detection with dynamic confidence threshold
+                detections, inference_ms = self.detector.detect(frame, conf_threshold=self.conf_threshold)
                 tracked_objects = self.tracker.update(detections)
+
+                # Class breakdown
+                class_dist: Dict[str, int] = {}
+                for d in detections:
+                    class_dist[d.class_name] = class_dist.get(d.class_name, 0) + 1
 
                 # DB logging (throttled)
                 if config.DETAILED_LOGGING or (self.frame_count % config.DB_LOG_INTERVAL == 0):
@@ -213,30 +246,31 @@ class VideoProcessor:
                     self.log_detections_to_db(tracked_objects, self.frame_count, timestamp_ms)
 
                 # Annotation
-                annotated = self.annotate_frame(frame, tracked_objects, detections, fps)
+                annotated = self.annotate_frame(frame, tracked_objects, detections, fps, inference_ms)
 
                 # JPEG encode
                 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 80]
                 _, buffer = cv2.imencode('.jpg', annotated, encode_param)
                 jpg_as_text = base64.b64encode(buffer).decode('utf-8')
 
-                # Send via WebSocket
                 payload = {
                     "type": "frame",
                     "frame_data": jpg_as_text,
                     "fps": round(fps, 1),
+                    "inference_ms": inference_ms,
                     "objects_count": len(detections),
                     "tracks_count": len(tracked_objects),
-                    "frame_index": self.frame_count
+                    "frame_index": self.frame_count,
+                    "class_distribution": class_dist,
+                    "resolution": f"{frame.shape[1]}x{frame.shape[0]}"
                 }
                 await websocket.send_json(payload)
-
-                # Yield control to event loop
                 await asyncio.sleep(0.005)
 
         except Exception as e:
             print(f"[VideoProcessor] Webcam stream interrupted: {e}")
         finally:
+            listener_task.cancel()
             cap.release()
             total_duration = time.time() - self.start_time
             self.update_session_summary(total_duration, self.frame_count)
@@ -262,12 +296,13 @@ class VideoProcessor:
         prev_time = time.time()
         fps = 0.0
 
+        listener_task = asyncio.create_task(self._handle_incoming_messages(websocket))
+
         try:
             while self.is_running:
                 loop_start = time.time()
                 ret, frame = cap.read()
                 if not ret or frame is None:
-                    # Video completed
                     await websocket.send_json({
                         "type": "finished",
                         "message": "Video playback and processing finished.",
@@ -284,24 +319,23 @@ class VideoProcessor:
 
                 self.frame_count += 1
 
-                # Resize if high resolution
                 if frame.shape[1] > 960:
                     scale = 960.0 / frame.shape[1]
                     frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
 
-                # Detection & Tracking
-                detections = self.detector.detect(frame)
+                detections, inference_ms = self.detector.detect(frame, conf_threshold=self.conf_threshold)
                 tracked_objects = self.tracker.update(detections)
 
-                # DB logging (throttled)
+                class_dist: Dict[str, int] = {}
+                for d in detections:
+                    class_dist[d.class_name] = class_dist.get(d.class_name, 0) + 1
+
                 if config.DETAILED_LOGGING or (self.frame_count % config.DB_LOG_INTERVAL == 0):
                     timestamp_ms = (self.frame_count / video_fps) * 1000.0
                     self.log_detections_to_db(tracked_objects, self.frame_count, timestamp_ms)
 
-                # Annotation
-                annotated = self.annotate_frame(frame, tracked_objects, detections, fps)
+                annotated = self.annotate_frame(frame, tracked_objects, detections, fps, inference_ms)
 
-                # JPEG encode
                 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 80]
                 _, buffer = cv2.imencode('.jpg', annotated, encode_param)
                 jpg_as_text = base64.b64encode(buffer).decode('utf-8')
@@ -310,13 +344,15 @@ class VideoProcessor:
                     "type": "frame",
                     "frame_data": jpg_as_text,
                     "fps": round(fps, 1),
+                    "inference_ms": inference_ms,
                     "objects_count": len(detections),
                     "tracks_count": len(tracked_objects),
-                    "frame_index": self.frame_count
+                    "frame_index": self.frame_count,
+                    "class_distribution": class_dist,
+                    "resolution": f"{frame.shape[1]}x{frame.shape[0]}"
                 }
                 await websocket.send_json(payload)
 
-                # Pace playback to match video framerate
                 computation_time = time.time() - loop_start
                 sleep_time = max(0.005, frame_delay - computation_time)
                 await asyncio.sleep(sleep_time)
@@ -324,6 +360,7 @@ class VideoProcessor:
         except Exception as e:
             print(f"[VideoProcessor] Video file stream error: {e}")
         finally:
+            listener_task.cancel()
             cap.release()
             total_duration = time.time() - self.start_time
             self.update_session_summary(total_duration, self.frame_count)

@@ -107,5 +107,32 @@ class TestDetectionAndTracking(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIsInstance(res.json(), list)
 
+    def test_auth_and_export(self):
+        """Verify user registration, login, and telemetry export."""
+        client = TestClient(app)
+        unique_suffix = str(np.random.randint(10000, 99999))
+
+        # Register
+        reg_res = client.post("/api/auth/register", json={
+            "username": f"testuser_{unique_suffix}",
+            "email": f"test_{unique_suffix}@trackoptic.ai",
+            "password": "Password123!"
+        })
+        self.assertEqual(reg_res.status_code, 200)
+        token = reg_res.json()["access_token"]
+        self.assertIsNotNone(token)
+
+        # Login
+        login_res = client.post("/api/auth/login", json={
+            "username_or_email": f"testuser_{unique_suffix}",
+            "password": "Password123!"
+        })
+        self.assertEqual(login_res.status_code, 200)
+
+        # Profile /me
+        me_res = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+        self.assertEqual(me_res.status_code, 200)
+        self.assertEqual(me_res.json()["username"], f"testuser_{unique_suffix}")
+
 if __name__ == "__main__":
     unittest.main()

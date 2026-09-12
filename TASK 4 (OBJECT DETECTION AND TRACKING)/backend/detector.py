@@ -2,7 +2,8 @@
 Object Detection module using Ultralytics YOLOv8.
 """
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Optional
+import time
 import numpy as np
 from ultralytics import YOLO
 import config
@@ -27,29 +28,33 @@ class ObjectDetector:
         self.model.predict(dummy, device=self.device, verbose=False)
         print(f"[ObjectDetector] Model '{self.model_name}' loaded successfully.")
 
-    def detect(self, frame: np.ndarray) -> List[DetectionResult]:
+    def detect(self, frame: np.ndarray, conf_threshold: Optional[float] = None) -> Tuple[List[DetectionResult], float]:
         """
         Run object detection on an input RGB/BGR frame.
-        Returns a list of DetectionResult objects.
+        Returns a tuple of (detections_list, inference_time_ms).
         """
         if frame is None or frame.size == 0:
-            return []
+            return [], 0.0
 
+        conf = conf_threshold if conf_threshold is not None else self.conf_threshold
+
+        t0 = time.time()
         results = self.model.predict(
             source=frame,
-            conf=self.conf_threshold,
+            conf=conf,
             device=self.device,
             verbose=False
         )
+        inference_ms = (time.time() - t0) * 1000.0
 
         detections: List[DetectionResult] = []
         if not results:
-            return detections
+            return detections, round(inference_ms, 1)
 
         res = results[0]
         boxes = res.boxes
         if boxes is None or len(boxes) == 0:
-            return detections
+            return detections, round(inference_ms, 1)
 
         names = res.names  # dict of class id -> class name
 
@@ -68,4 +73,4 @@ class ObjectDetector:
                 )
             )
 
-        return detections
+        return detections, round(inference_ms, 1)

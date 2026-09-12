@@ -250,12 +250,17 @@ cd "TASK 2 (FAQ CHATBOT AI)\backend"
 
 - 🎨 **TrackOptic AI Vector Branding**: Custom SVG optical reticle target logo with adaptive light/dark appearance.
 - 🌓 **Instant Light & Dark Mode**: Persistent theme toggle with deep slate and reddish glow dark mode palette.
+- 🔐 **JWT User Authentication & Session Ownership**: Secure password hashing with bcrypt, JWT bearer tokens, 1-click Demo Analyst mode, user profile badge, and "My Sessions" vs "All Sessions" audit view.
+- 🎛️ **Dynamic Vision Control Toolbar**: Real-time confidence and IoU overlap sliders that adjust inference parameters on the fly via WebSocket without restarting the stream.
+- 🎯 **Tactical Targeting Reticle**: Military-grade holographic crosshair overlay with corner brackets and millimeter tick marks.
+- 📸 **1-Click High-Res Snapshot**: Instant PNG capture of the currently tracked frame with bounding boxes and track badges.
+- 🔊 **Target Lock Audio Alerts**: Interactive web audio chimes when high-confidence targets are acquired.
 - 📹 **Dual-Mode Video Input**: Real-time live webcam processing or short video file upload (MP4, AVI, MOV, WEBM).
 - 🧠 **YOLOv8 Deep Learning Detection**: Pre-trained on 80 COCO classes with real-time bounding box and confidence score generation.
 - 🎯 **SORT Multi-Object Tracking**: Kalman filter motion estimation and Hungarian IoU assignment for persistent, consistent track IDs across frames.
-- 🎨 **Visual Annotations & Overlays**: Bounding boxes with consistent track colors, confidence badges, embedded frame HUD, and real-time telemetry pill.
-- ⚡ **WebSocket Streaming**: Full-duplex WebSocket connection streaming base64 JPEG frames alongside live FPS, detection count, and track count.
-- 🗄️ **SQLite Telemetry Logging**: Automatically tracks session metadata and throttled detection logs with interactive audit viewer.
+- 📊 **Live Class Distribution & Latency HUD**: Dynamic pill tags showing detected object categories and inference time in milliseconds.
+- 💾 **Telemetry Audit & Instant Exports**: Export session metrics and detection tracks directly to CSV and JSON with 1 click.
+- ⚡ **WebSocket Streaming**: Full-duplex WebSocket connection streaming base64 JPEG frames alongside live FPS, latency, detection count, and track count.
 
 ### 🚀 Quick Start Guide (Task 4)
 
@@ -296,11 +301,12 @@ Open your browser at **[http://localhost:5173](http://localhost:5173)**.
 - **Frontend**: React 18, Vite 5, TypeScript 5, Tailwind CSS 3, Lucide React icons
 - **Testing**: `pytest`, `httpx`, `TestClient`
 
-### Task 4: Real-Time Object Detection & Tracking
+### Task 4: TrackOptic AI (Real-Time Vision & Tracking)
 - **Backend**: Python 3.11, FastAPI, WebSockets, OpenCV (`cv2`), SQLAlchemy, Pydantic v2, Uvicorn
+- **Authentication**: JWT (`pyjwt`), salted password hashing (`bcrypt`)
 - **Computer Vision & Tracking**: Ultralytics `YOLOv8n`, PyTorch, TorchVision, SciPy (`linear_sum_assignment`), NumPy
 - **Frontend**: React 18, Vite 5, TypeScript 5, Tailwind CSS 3 (Reddish Theme), HTML5 Canvas, Lucide React
-- **Database**: SQLite 3 (`sessions` and `detections` tables)
+- **Database**: SQLite 3 (`users`, `sessions`, and `detections` tables)
 
 ---
 
