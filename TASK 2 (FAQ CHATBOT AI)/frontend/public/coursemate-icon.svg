@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+
+    <!-- Vibrant Brand Gradients -->
+    <linearGradient id="brandGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="40%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+
+    <linearGradient id="brandGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7" />
+      <stop offset="60%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <linearGradient id="capGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="50%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+
+    <!-- Glow Effect Filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Container Box with Rounded Corners -->
+  <rect x="6" y="6" width="108" height="108" rx="28" fill="url(#bgGrad)" stroke="#334155" stroke-width="2.5" />
+
+  <!-- Outer Neon Aura / Ring Segment -->
+  <path d="M 28 44 C 28 26, 44 18, 60 18 C 76 18, 92 26, 92 44" fill="none" stroke="url(#brandGrad1)" stroke-width="3" stroke-linecap="round" opacity="0.35" />
+
+  <!-- Graduation Cap (Education Symbol) -->
+  <!-- Mortarboard Top Rhombus -->
+  <polygon points="60,28 92,42 60,56 28,42" fill="url(#capGrad)" filter="url(#softGlow)" />
+  
+  <!-- Mortarboard Lower Cap Arc -->
+  <path d="M 40 48 L 40 62 C 40 70, 80 70, 80 62 L 80 48" fill="none" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Tassel Ribbon & AI Orb -->
+  <path d="M 60 42 L 88 56 L 88 74" fill="none" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="88" cy="76" r="3.5" fill="#38BDF8" />
+
+  <!-- Open Book / AI Neural Wings at Base -->
+  <!-- Left Page / Wing forming stylized "C" -->
+  <path d="M 60 76 C 46 72, 32 75, 24 86 C 36 94, 52 88, 60 82 Z" fill="url(#brandGrad1)" />
+  <!-- Right Page / Wing -->
+  <path d="M 60 76 C 74 72, 88 75, 96 86 C 84 94, 68 88, 60 82 Z" fill="url(#brandGrad2)" />
+
+  <!-- Central Spine Spark Line -->
+  <line x1="60" y1="72" x2="60" y2="88" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+
+  <!-- AI Center Sparkle (Intelligence Symbol) -->
+  <path d="M 60 62 Q 60 68 66 68 Q 60 68 60 74 Q 60 68 54 68 Q 60 68 60 62 Z" fill="#FFFFFF" filter="url(#softGlow)" />
+</svg>

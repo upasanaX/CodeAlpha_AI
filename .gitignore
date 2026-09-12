@@ -7,11 +7,17 @@ env/
 **/*.py[cod]
 *$py.class
 
-# Node dependencies
+# Node dependencies & build output
 **/node_modules/
+**/dist/
+dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Pytest cache
+**/.pytest_cache/
+.pytest_cache/
 
 # Environment and secrets
 **/.env
