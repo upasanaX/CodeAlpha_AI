@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Header } from './components/Header';
+import { LandingPage } from './components/LandingPage';
 import { ControlPanel } from './components/ControlPanel';
 import { VisionToolbar } from './components/VisionToolbar';
 import { VideoDisplay, VideoDisplayHandle } from './components/VideoDisplay';
@@ -10,6 +11,9 @@ import { videoApi } from './api/videoApi';
 import { Session, HealthResponse, FramePayload, UploadResponse, User } from './types';
 
 export const App: React.FC = () => {
+  // Navigation View State ('landing' | 'console')
+  const [currentView, setCurrentView] = useState<'landing' | 'console'>('landing');
+
   // Theme State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     const saved = localStorage.getItem('trackoptic_theme');
@@ -296,83 +300,94 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0b0f17] text-gray-900 dark:text-gray-100 selection:bg-brand-100 selection:text-brand-900 transition-colors duration-200">
-      {/* Header with Auth & Theme */}
+      {/* Header with Navigation, Auth & Theme */}
       <Header
         health={health}
         isConnected={isRunning}
         isDarkMode={isDarkMode}
         currentUser={currentUser}
+        activeTab={currentView}
+        onSelectTab={(tab) => setCurrentView(tab)}
         onToggleTheme={toggleTheme}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onLogout={handleLogout}
       />
 
-      {/* Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Controls */}
-        <ControlPanel
-          isRunning={isRunning}
-          activeSource={activeSource}
-          cameraIndex={cameraIndex}
-          onStartWebcam={handleStartWebcam}
-          onStop={stopStream}
-          onUploadFile={handleUploadFile}
-          onStartFileProcessing={handleStartFileProcessing}
-          onSwitchCamera={handleSwitchCamera}
-          fps={fps}
-          objectsCount={objectsCount}
-          tracksCount={tracksCount}
-          isUploading={isUploading}
-        />
-
-        {/* Vision Intelligence & Sensitivity Toolbar */}
-        <VisionToolbar
-          confThreshold={confThreshold}
-          iouThreshold={iouThreshold}
-          onConfChange={handleConfChange}
-          onIouChange={handleIouChange}
-          classDistribution={classDistribution}
-          inferenceMs={inferenceMs}
-          resolution={resolution}
-          isGridOverlay={isGridOverlay}
-          onToggleGridOverlay={() => setIsGridOverlay(prev => !prev)}
-          isAudioAlert={isAudioAlert}
-          onToggleAudioAlert={() => setIsAudioAlert(prev => !prev)}
-          onTakeSnapshot={handleTakeSnapshot}
-          onToggleFullscreen={handleToggleFullscreen}
-          isRunning={isRunning}
-        />
-
-        {/* Live Video Viewport */}
-        <VideoDisplay
-          ref={videoDisplayRef}
-          currentFrame={currentFrame}
-          isRunning={isRunning}
-          activeSource={activeSource}
-          fps={fps}
-          objectsCount={objectsCount}
-          tracksCount={tracksCount}
-          isGridOverlay={isGridOverlay}
-          errorMessage={errorMessage}
-          onDismissError={() => setErrorMessage(null)}
-        />
-
-        {/* Telemetry Audit & Session Registry */}
-        <SessionTable
-          sessions={sessions}
-          isLoading={isLoadingSessions}
+      {/* Conditionally Render Landing Page vs Live Command Center */}
+      {currentView === 'landing' ? (
+        <LandingPage
+          onLaunchConsole={() => setCurrentView('console')}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
           currentUser={currentUser}
-          filterMySessions={filterMySessions}
-          onToggleFilterMySessions={() => {
-            const next = !filterMySessions;
-            setFilterMySessions(next);
-            loadSessions(next);
-          }}
-          onRefresh={() => loadSessions()}
-          onSelectSession={(sess) => setSelectedSession(sess)}
-          onDeleteSession={handleDeleteSession}
         />
-      </main>
+      ) : (
+        /* Main Command Center Workspace */
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Controls */}
+          <ControlPanel
+            isRunning={isRunning}
+            activeSource={activeSource}
+            cameraIndex={cameraIndex}
+            onStartWebcam={handleStartWebcam}
+            onStop={stopStream}
+            onUploadFile={handleUploadFile}
+            onStartFileProcessing={handleStartFileProcessing}
+            onSwitchCamera={handleSwitchCamera}
+            fps={fps}
+            objectsCount={objectsCount}
+            tracksCount={tracksCount}
+            isUploading={isUploading}
+          />
+
+          {/* Vision Intelligence & Sensitivity Toolbar */}
+          <VisionToolbar
+            confThreshold={confThreshold}
+            iouThreshold={iouThreshold}
+            onConfChange={handleConfChange}
+            onIouChange={handleIouChange}
+            classDistribution={classDistribution}
+            inferenceMs={inferenceMs}
+            resolution={resolution}
+            isGridOverlay={isGridOverlay}
+            onToggleGridOverlay={() => setIsGridOverlay(prev => !prev)}
+            isAudioAlert={isAudioAlert}
+            onToggleAudioAlert={() => setIsAudioAlert(prev => !prev)}
+            onTakeSnapshot={handleTakeSnapshot}
+            onToggleFullscreen={handleToggleFullscreen}
+            isRunning={isRunning}
+          />
+
+          {/* Live Video Viewport */}
+          <VideoDisplay
+            ref={videoDisplayRef}
+            currentFrame={currentFrame}
+            isRunning={isRunning}
+            activeSource={activeSource}
+            fps={fps}
+            objectsCount={objectsCount}
+            tracksCount={tracksCount}
+            isGridOverlay={isGridOverlay}
+            errorMessage={errorMessage}
+            onDismissError={() => setErrorMessage(null)}
+          />
+
+          {/* Telemetry Audit & Session Registry */}
+          <SessionTable
+            sessions={sessions}
+            isLoading={isLoadingSessions}
+            currentUser={currentUser}
+            filterMySessions={filterMySessions}
+            onToggleFilterMySessions={() => {
+              const next = !filterMySessions;
+              setFilterMySessions(next);
+              loadSessions(next);
+            }}
+            onRefresh={() => loadSessions()}
+            onSelectSession={(sess) => setSelectedSession(sess)}
+            onDeleteSession={handleDeleteSession}
+          />
+        </main>
+      )}
 
       {/* Telemetry Modal */}
       {selectedSession && (
@@ -398,7 +413,7 @@ export const App: React.FC = () => {
           <div className="flex items-center space-x-2">
             <span className="font-bold text-gray-700 dark:text-gray-200">TrackOptic AI</span>
             <span>•</span>
-            <span>CodeAlpha AI Internship Task 4</span>
+            <span>Precision Multi-Object Vision Intelligence System</span>
           </div>
           <div className="flex items-center space-x-3 text-gray-400 dark:text-gray-500 font-mono text-[11px]">
             <span>FastAPI + WebSockets</span>

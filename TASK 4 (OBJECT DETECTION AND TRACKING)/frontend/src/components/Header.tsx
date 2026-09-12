@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Activity, Sun, Moon, LogIn, LogOut, ChevronDown } from 'lucide-react';
+import { Cpu, Activity, Sun, Moon, LogIn, LogOut, ChevronDown, Sparkles, Crosshair } from 'lucide-react';
 import { HealthResponse, User } from '../types';
 import { Logo } from './Logo';
 
@@ -8,6 +8,8 @@ interface HeaderProps {
   isConnected: boolean;
   isDarkMode: boolean;
   currentUser: User | null;
+  activeTab?: 'landing' | 'console';
+  onSelectTab?: (tab: 'landing' | 'console') => void;
   onToggleTheme: () => void;
   onOpenAuthModal: () => void;
   onLogout: () => void;
@@ -18,6 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   isConnected,
   isDarkMode,
   currentUser,
+  activeTab = 'landing',
+  onSelectTab,
   onToggleTheme,
   onOpenAuthModal,
   onLogout
@@ -28,8 +32,11 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="bg-white dark:bg-[#111622] border-b border-gray-200 dark:border-gray-800 shadow-xs sticky top-0 z-30 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         {/* Brand & Logo */}
-        <div className="flex items-center space-x-3">
-          <Logo className="w-10 h-10" showText={false} />
+        <div 
+          className="flex items-center space-x-3 cursor-pointer group"
+          onClick={() => onSelectTab && onSelectTab('landing')}
+        >
+          <Logo className="w-10 h-10 group-hover:scale-105 transition-transform" showText={false} />
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight flex items-center">
@@ -43,10 +50,38 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-              Task 4 – AI Internship <span className="mx-1">•</span> Vision Intelligence Command Center
+              Real-Time Multi-Object Detection & Tracking <span className="mx-1">•</span> Vision Intelligence Command Center
             </p>
           </div>
         </div>
+
+        {/* View Switcher Tabs */}
+        {onSelectTab && (
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-inner">
+            <button
+              onClick={() => onSelectTab('landing')}
+              className={`px-3.5 py-1.5 rounded-lg font-semibold text-xs transition-all flex items-center space-x-1.5 ${
+                activeTab === 'landing'
+                  ? 'bg-white dark:bg-gray-900 text-brand-600 dark:text-brand-400 shadow-sm border border-gray-200/60 dark:border-gray-700'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Overview</span>
+            </button>
+            <button
+              onClick={() => onSelectTab('console')}
+              className={`px-3.5 py-1.5 rounded-lg font-semibold text-xs transition-all flex items-center space-x-1.5 ${
+                activeTab === 'console'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <Crosshair className="w-3.5 h-3.5" />
+              <span>Command Center</span>
+            </button>
+          </div>
+        )}
 
         {/* Status Indicators, Auth & Theme Switcher */}
         <div className="flex items-center flex-wrap gap-2 text-xs">
