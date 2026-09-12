@@ -44,19 +44,19 @@ export const VideoDisplay: React.FC<VideoDisplayProps> = ({
   }, [currentFrame]);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-6">
+    <div className="bg-white dark:bg-[#111622] border border-gray-200 dark:border-gray-800 rounded-lg shadow-xs p-4 mb-6 transition-colors duration-200">
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center space-x-2">
-          <MonitorPlay className="w-4 h-4 text-brand-600" />
-          <h2 className="text-sm font-bold text-gray-800 tracking-wide uppercase">Live Processing Viewport</h2>
+          <MonitorPlay className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 tracking-wide uppercase">Live Processing Viewport</h2>
         </div>
-        <span className="text-xs text-gray-500 font-mono">
+        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
           {activeSource === 'webcam' ? 'Source: Real-time Camera' : activeSource === 'file' ? 'Source: Video File Stream' : 'Source: None'}
         </span>
       </div>
 
       {/* Main Viewport Container */}
-      <div className="relative w-full aspect-video bg-gray-950 rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 shadow-inner">
+      <div className="relative w-full aspect-video bg-gray-950 dark:bg-black rounded-lg overflow-hidden flex items-center justify-center border border-gray-800 dark:border-gray-900 shadow-inner">
         {/* Error Notification Overlay */}
         {errorMessage && (
           <div className="absolute top-4 left-4 right-4 z-20 bg-red-900/90 backdrop-blur-sm border border-red-500 text-white rounded-md p-3.5 flex items-start justify-between shadow-lg">
@@ -86,7 +86,7 @@ export const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
             {/* Minimal In-Viewport HUD Badge (Top-Right) */}
             <div className="absolute top-3 right-3 z-10 flex items-center space-x-2 pointer-events-none">
-              <div className="bg-black/70 backdrop-blur-sm border border-gray-700/80 text-white rounded-md px-3 py-1.5 flex items-center space-x-3 text-xs font-mono shadow-md">
+              <div className="bg-black/75 backdrop-blur-sm border border-gray-700/80 text-white rounded-md px-3 py-1.5 flex items-center space-x-3 text-xs font-mono shadow-md">
                 <div className="flex items-center space-x-1">
                   <Zap className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
                   <span className="font-semibold text-gray-200">{fps.toFixed(1)} FPS</span>
@@ -111,7 +111,7 @@ export const VideoDisplay: React.FC<VideoDisplayProps> = ({
               <Camera className="w-8 h-8 stroke-[1.5]" />
             </div>
             <h3 className="text-base font-semibold text-gray-200 mb-1">No Active Video Stream</h3>
-            <p className="text-xs text-gray-500 leading-relaxed mb-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
               Click <span className="font-medium text-brand-400">"Start Webcam"</span> to begin live detection & tracking from your camera, or <span className="font-medium text-brand-400">"Upload Video"</span> to track objects in a recorded MP4/AVI clip.
             </p>
             <div className="flex items-center space-x-4 text-[11px] text-gray-400 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-full font-mono">

@@ -8,6 +8,29 @@ import { videoApi } from './api/videoApi';
 import { Session, HealthResponse, FramePayload, UploadResponse } from './types';
 
 export const App: React.FC = () => {
+  // Theme State (Light / Dark Mode)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('trackoptic_theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  // Sync theme with HTML root class
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add('dark');
+      localStorage.setItem('trackoptic_theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('trackoptic_theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
   // Application State
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [isRunning, setIsRunning] = useState<boolean>(false);
@@ -65,7 +88,6 @@ export const App: React.FC = () => {
     setObjectsCount(0);
     setTracksCount(0);
     videoApi.stopProcessing().catch(() => {});
-    // Refresh sessions list to show newly completed session
     setTimeout(() => {
       videoApi.getSessions().then(setSessions).catch(() => {});
     }, 500);
@@ -132,7 +154,6 @@ export const App: React.FC = () => {
     setIsUploading(true);
     try {
       const res = await videoApi.uploadVideo(file);
-      // Refresh sessions
       const s = await videoApi.getSessions();
       setSessions(s);
       return res;
@@ -156,9 +177,14 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 selection:bg-brand-100 selection:text-brand-900">
-      {/* Header */}
-      <Header health={health} isConnected={isRunning} />
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#0b0f17] text-gray-900 dark:text-gray-100 selection:bg-brand-100 selection:text-brand-900 transition-colors duration-200">
+      {/* Header with Theme Toggle */}
+      <Header
+        health={health}
+        isConnected={isRunning}
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+      />
 
       {/* Main Workspace Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -211,19 +237,19 @@ export const App: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-4 mt-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="bg-white dark:bg-[#111622] border-t border-gray-200 dark:border-gray-800 py-4 mt-8 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500 dark:text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            <span className="font-semibold text-gray-700">CodeAlpha AI Internship</span> • Task 4: Real-Time Object Detection & Tracking
+            <span className="font-semibold text-gray-700 dark:text-gray-200">TrackOptic AI</span> • CodeAlpha AI Internship Task 4
           </div>
-          <div className="flex items-center space-x-3 text-gray-400">
+          <div className="flex items-center space-x-3 text-gray-400 dark:text-gray-500">
             <span>FastAPI Backend</span>
             <span>•</span>
             <span>Ultralytics YOLOv8</span>
             <span>•</span>
             <span>SORT Tracking</span>
             <span>•</span>
-            <span>Vite + React</span>
+            <span>React + TypeScript</span>
           </div>
         </div>
       </footer>

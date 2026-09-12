@@ -20,7 +20,7 @@ This repository showcases production-ready, full-stack AI web applications built
 
 - 🌐 **Task 1: LinguoFlow PRO ✨ (AI Language Translation)**: A feature-rich multilingual translation suite built with Flask, deep-translator, Web Speech API dictation (STT), high-fidelity speech synthesis (TTS), tone and personality variations, and persistent cloud history sync.
 - 🤖 **Task 2: Coursemate AI Assistant 🎓 (Intelligent FAQ Chatbot)**: A full-stack FAQ chatbot application built for an online learning academy utilizing an NLTK NLP preprocessing pipeline (lowercasing, punctuation stripping, tokenization, stopword removal, WordNet lemmatization), Scikit-learn TF-IDF vectorization, Cosine Similarity matching, an SQLite knowledge base with 22 curated Q&As, a React + Vite + TypeScript + Tailwind chat UI, and an interactive Knowledge Base Admin panel with live model re-training.
-- 🎯 **Task 4: Real-Time Object Detection & Tracking (YOLOv8 + SORT)**: A production-quality real-time computer vision system featuring Ultralytics YOLOv8 object detection, SORT multi-object tracking (Kalman Filter + Hungarian Algorithm), FastAPI WebSocket frame streaming, SQLite telemetry logging, and a formal reddish React + TypeScript + Tailwind web application with dual-mode webcam and video file processing.
+- 🎯 **Task 4: TrackOptic AI 🎯 (Real-Time Vision & Tracking)**: A production-quality real-time computer vision system featuring Ultralytics YOLOv8 object detection, SORT multi-object tracking (Kalman Filter + Hungarian Algorithm), FastAPI WebSocket frame streaming, SQLite telemetry logging, custom optical target branding, and a formal reddish React + TypeScript + Tailwind web application with dual-mode webcam / video file processing and seamless Light & Dark mode support.
 
 All projects are completely self-contained in dedicated folders with independent dependencies, automated test suites, responsive user interfaces, and detailed quick-start instructions.
 
@@ -32,7 +32,7 @@ All projects are completely self-contained in dedicated folders with independent
 |---|---|---|---|---|
 | **Task 1** | **LinguoFlow PRO ✨** | Intelligent Multilingual AI Translation Web App with Voice Dictation, Speech Synthesis, Theme Switching, and Cloud Sync | [`TASK 1(TRANSLATION APP AI)/`](TASK%201(TRANSLATION%20APP%20AI)/) | ✅ Complete & Verified |
 | **Task 2** | **Coursemate AI FAQ Assistant 🤖** | Production-Ready FAQ Chatbot Web App with NLTK Preprocessing, TF-IDF Vectorization, Cosine Similarity & Admin Knowledge Base | [`TASK 2 (FAQ CHATBOT AI)/`](TASK%202%20(FAQ%20CHATBOT%20AI)/) | ✅ Complete & Verified |
-| **Task 4** | **Real-Time Object Detection & Tracking 🎯** | Live Webcam & Video Object Detection (YOLOv8) and Multi-Object Tracking (SORT) with WebSocket Streaming & Reddish UI | [`TASK 4 (OBJECT DETECTION AND TRACKING)/`](TASK%204%20(OBJECT%20DETECTION%20AND%20TRACKING)/) | ✅ Complete & Verified |
+| **Task 4** | **TrackOptic AI 🎯** | Real-Time Object Detection (YOLOv8) & Multi-Object Tracking (SORT) with WebSocket Streaming, Optical Vector Logo & Light/Dark Mode | [`TASK 4 (OBJECT DETECTION AND TRACKING)/`](TASK%204%20(OBJECT%20DETECTION%20AND%20TRACKING)/) | ✅ Complete & Verified |
 
 ---
 
@@ -242,12 +242,14 @@ cd "TASK 2 (FAQ CHATBOT AI)\backend"
 
 ---
 
-## 🎯 Task 4: Real-Time Object Detection & Tracking (YOLOv8 + SORT)
+## 🎯 Task 4: TrackOptic AI (Real-Time Vision & Tracking)
 
-**Task 4** is a high-performance computer vision web application built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal, reddish design system.
+**TrackOptic AI** is a high-performance computer vision web application built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal, reddish design system featuring seamless **Light & Dark Mode** switching.
 
 ### ✨ Key Features
 
+- 🎨 **TrackOptic AI Vector Branding**: Custom SVG optical reticle target logo with adaptive light/dark appearance.
+- 🌓 **Instant Light & Dark Mode**: Persistent theme toggle with deep slate and reddish glow dark mode palette.
 - 📹 **Dual-Mode Video Input**: Real-time live webcam processing or short video file upload (MP4, AVI, MOV, WEBM).
 - 🧠 **YOLOv8 Deep Learning Detection**: Pre-trained on 80 COCO classes with real-time bounding box and confidence score generation.
 - 🎯 **SORT Multi-Object Tracking**: Kalman filter motion estimation and Hungarian IoU assignment for persistent, consistent track IDs across frames.

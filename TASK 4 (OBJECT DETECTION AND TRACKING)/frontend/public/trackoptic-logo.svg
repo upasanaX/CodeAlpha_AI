@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect x="4" y="4" width="92" height="92" rx="24" fill="#FEF2F2" stroke="#FECACA" stroke-width="3"/>
+  <path d="M24 36V26C24 24.8954 24.8954 24 26 24H36" stroke="#DC2626" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M76 36V26C76 24.8954 75.1046 24 74 24H64" stroke="#DC2626" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M24 64V74C24 75.1046 24.8954 76 26 76H36" stroke="#DC2626" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M76 64V74C76 75.1046 75.1046 76 74 76H64" stroke="#DC2626" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="50" cy="50" r="26" stroke="#EF4444" stroke-opacity="0.4" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <circle cx="50" cy="50" r="16" stroke="#DC2626" stroke-width="3.5" fill="#DC2626" fill-opacity="0.1"/>
+  <circle cx="50" cy="50" r="6" fill="#DC2626"/>
+  <line x1="50" y1="16" x2="50" y2="22" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="78" x2="50" y2="84" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+  <line x1="16" y1="50" x2="22" y2="50" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+  <line x1="78" y1="50" x2="84" y2="50" stroke="#DC2626" stroke-width="3" stroke-linecap="round"/>
+</svg>

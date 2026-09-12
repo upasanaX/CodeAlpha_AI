@@ -59,35 +59,35 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     : 'Video File Processing Active';
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 md:p-5 mb-6">
+    <div className="bg-white dark:bg-[#111622] border border-gray-200 dark:border-gray-800 rounded-lg shadow-xs p-4 md:p-5 mb-6 transition-colors duration-200">
       {/* Top Status & Telemetry Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5 pb-4 border-b border-gray-100">
-        <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-          <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">Execution Status</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 rounded-md p-3">
+          <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">Execution Status</span>
           <div className="mt-1 flex items-center space-x-1.5">
-            <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-brand-600 animate-pulse' : 'bg-gray-400'}`} />
-            <span className="text-sm font-semibold text-gray-900 truncate">{statusLabel}</span>
+            <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-brand-600 animate-pulse' : 'bg-gray-400 dark:bg-gray-600'}`} />
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{statusLabel}</span>
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-          <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">Real-Time FPS</span>
-          <div className="mt-1 text-lg font-bold text-gray-900 font-mono">
-            {fps.toFixed(1)} <span className="text-xs text-gray-500 font-normal">fps</span>
+        <div className="bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 rounded-md p-3">
+          <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">Real-Time FPS</span>
+          <div className="mt-1 text-lg font-bold text-gray-900 dark:text-white font-mono">
+            {fps.toFixed(1)} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">fps</span>
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-          <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">Detections (YOLOv8)</span>
-          <div className="mt-1 text-lg font-bold text-brand-700 font-mono">
-            {objectsCount} <span className="text-xs text-gray-500 font-normal">objects</span>
+        <div className="bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 rounded-md p-3">
+          <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">Detections (YOLOv8)</span>
+          <div className="mt-1 text-lg font-bold text-brand-600 dark:text-brand-400 font-mono">
+            {objectsCount} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">objects</span>
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-          <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider block">Active Tracks (SORT)</span>
-          <div className="mt-1 text-lg font-bold text-emerald-700 font-mono">
-            {tracksCount} <span className="text-xs text-gray-500 font-normal">tracks</span>
+        <div className="bg-gray-50 dark:bg-[#0c1017] border border-gray-200 dark:border-gray-800 rounded-md p-3">
+          <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">Active Tracks (SORT)</span>
+          <div className="mt-1 text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+            {tracksCount} <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">tracks</span>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           <button
             onClick={onStartWebcam}
             disabled={isRunning && activeSource === 'webcam'}
-            className={`inline-flex items-center space-x-2 font-medium text-sm rounded-md px-4 py-2.5 transition-colors shadow-sm ${
+            className={`inline-flex items-center space-x-2 font-medium text-sm rounded-md px-4 py-2.5 transition-colors shadow-xs ${
               isRunning && activeSource === 'webcam'
                 ? 'bg-brand-700 text-white cursor-not-allowed opacity-90'
                 : 'bg-brand-600 hover:bg-brand-700 text-white'
@@ -114,10 +114,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           <button
             onClick={onStop}
             disabled={!isRunning}
-            className={`inline-flex items-center space-x-2 font-medium text-sm rounded-md px-4 py-2.5 transition-colors shadow-sm ${
+            className={`inline-flex items-center space-x-2 font-medium text-sm rounded-md px-4 py-2.5 transition-colors shadow-xs ${
               !isRunning
-                ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                : 'bg-gray-800 hover:bg-gray-900 text-white'
+                ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 cursor-not-allowed'
+                : 'bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white'
             }`}
           >
             <Square className="w-4 h-4 fill-current" />
@@ -129,9 +129,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             onClick={() => onSwitchCamera(cameraIndex === 0 ? 1 : 0)}
             disabled={isRunning && activeSource !== 'webcam'}
             title="Toggle between Camera 0 and Camera 1"
-            className="inline-flex items-center space-x-1.5 font-medium text-sm rounded-md px-3.5 py-2.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+            className="inline-flex items-center space-x-1.5 font-medium text-sm rounded-md px-3.5 py-2.5 bg-white dark:bg-[#161c28] border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-xs"
           >
-            <RefreshCw className="w-4 h-4 text-gray-500" />
+            <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             <span>Cam: {cameraIndex}</span>
           </button>
 
@@ -147,25 +147,25 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           <button
             onClick={triggerUploadClick}
             disabled={isUploading}
-            className="inline-flex items-center space-x-2 font-medium text-sm rounded-md px-4 py-2.5 bg-white border border-brand-300 text-brand-700 hover:bg-brand-50 transition-colors shadow-sm"
+            className="inline-flex items-center space-x-2 font-medium text-sm rounded-md px-4 py-2.5 bg-white dark:bg-[#161c28] border border-brand-300 dark:border-brand-800 text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors shadow-xs"
           >
-            <Upload className="w-4 h-4 text-brand-600" />
+            <Upload className="w-4 h-4 text-brand-600 dark:text-brand-400" />
             <span>{isUploading ? 'Uploading...' : 'Upload Video'}</span>
           </button>
         </div>
 
         {/* Video File Action & Badge if uploaded */}
         {uploadedVideo && (
-          <div className="flex items-center space-x-3 bg-red-50/70 border border-brand-200 rounded-md px-3 py-1.5">
-            <div className="flex items-center space-x-2 text-xs text-brand-900 truncate max-w-xs">
-              <Film className="w-4 h-4 text-brand-600 shrink-0" />
+          <div className="flex items-center space-x-3 bg-red-50/70 dark:bg-red-950/40 border border-brand-200 dark:border-brand-900 rounded-md px-3 py-1.5">
+            <div className="flex items-center space-x-2 text-xs text-brand-900 dark:text-brand-300 truncate max-w-xs">
+              <Film className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0" />
               <span className="font-semibold truncate">{uploadedVideo.filename}</span>
             </div>
 
             <button
               onClick={() => onStartFileProcessing(uploadedVideo)}
               disabled={isRunning && activeSource === 'file'}
-              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded transition-colors shadow-sm"
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded transition-colors shadow-xs"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Process Video</span>
@@ -176,8 +176,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
       {/* Error Notice */}
       {uploadError && (
-        <div className="mt-3 flex items-center space-x-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-md p-2.5">
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+        <div className="mt-3 flex items-center space-x-2 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 rounded-md p-2.5">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
           <span>{uploadError}</span>
         </div>
       )}

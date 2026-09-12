@@ -1,12 +1,12 @@
-# Task 4: Real-Time Object Detection & Tracking Web Application
+# TrackOptic AI – Real-Time Multi-Object Detection & Tracking
 
-A production-quality full-stack AI web application for real-time multi-object detection and tracking using live webcam feeds or uploaded video files. Built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal, reddish design system.
+A production-quality full-stack AI web application for real-time multi-object detection and tracking using live webcam feeds or uploaded video files. Built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a formal reddish design system featuring seamless **Light & Dark Mode** support.
 
 ---
 
 ## 📌 Project Overview
 
-This project was developed as part of **Task 4: Object Detection & Tracking** for the **CodeAlpha AI Internship**. It provides a real-time computer vision pipeline that:
+**TrackOptic AI** was developed as part of **Task 4: Object Detection & Tracking** for the **CodeAlpha AI Internship**. It provides an advanced real-time computer vision pipeline that:
 1. Detects objects across 80 COCO classes using a pre-trained **YOLOv8** model.
 2. Tracks objects continuously across frames using the **SORT** algorithm, associating detections with Kalman-filtered bounding box trajectories and assigning unique, persistent tracking IDs.
 3. Renders bounding boxes, class labels, confidence scores, and consistent color-coded track IDs on each frame.
