@@ -1,12 +1,27 @@
-# CodeAlpha_AI - Artificial Intelligence Internship Projects
+# CodeAlpha_AI — Artificial Intelligence Internship Projects
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-CodeAlpha__AI-181717?style=for-the-badge&logo=github)](https://github.com/upasanaX/CodeAlpha_AI)
-[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.5+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-Welcome to the **CodeAlpha AI Internship** project repository developed by **Upasana Roy**. This repository contains AI solutions developed during the internship, starting with **Task 1: AI Language Translation Web Application**.
+---
+
+## 🌟 About the Repository & Internship
+
+Welcome to the **CodeAlpha Artificial Intelligence Internship** portfolio repository engineered by **Upasana Roy**. 
+
+This repository showcases production-ready, full-stack AI web applications built during the **CodeAlpha AI Internship**. Each project addresses real-world communication and learning workflows through modern Machine Learning, Natural Language Processing (NLP), and robust full-stack software design:
+
+- 🌐 **Task 1: LinguoFlow PRO ✨ (AI Language Translation)**: A feature-rich multilingual translation suite built with Flask, deep-translator, Web Speech API dictation (STT), high-fidelity speech synthesis (TTS), tone and personality variations, and persistent cloud history sync.
+- 🤖 **Task 2: Coursemate AI Assistant 🎓 (Intelligent FAQ Chatbot)**: A full-stack FAQ chatbot application built for an online learning academy utilizing an NLTK NLP preprocessing pipeline (lowercasing, punctuation stripping, tokenization, stopword removal, WordNet lemmatization), Scikit-learn TF-IDF vectorization, Cosine Similarity matching, an SQLite knowledge base with 22 curated Q&As, a React + Vite + TypeScript + Tailwind chat UI, and an interactive Knowledge Base Admin panel with live model re-training.
+
+Both projects are completely self-contained in dedicated folders with independent dependencies, automated test suites, responsive user interfaces, and detailed quick-start instructions.
 
 ---
 
