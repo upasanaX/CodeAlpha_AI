@@ -1,22 +1,56 @@
 # TrackOptic AI – Real-Time Multi-Object Detection & Tracking
 
-A production-quality full-stack AI web application for real-time multi-object detection and tracking using live webcam feeds or uploaded video files. Built with **FastAPI**, **YOLOv8**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS** with a high-tech tactical reddish command center design system featuring seamless **Light & Dark Mode** support, **JWT User Authentication**, **Live Sensitivity Sliders**, **Reticle HUD**, and **Telemetry Exports**.
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-00599C?style=for-the-badge&logo=opencv&logoColor=white)](https://ultralytics.com)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+
+A high-performance, full-stack computer vision application engineered by **Upasana Roy** for **Task 4: Object Detection & Tracking** during the **CodeAlpha AI Internship**. Built with **FastAPI**, **YOLOv8s/YOLOv8n**, **SORT (Kalman Filter + Hungarian Algorithm)**, and **React + TypeScript + Tailwind CSS**, featuring an executive landing page, live command center, multi-spectrum vision shaders, Kalman motion trails, and an automated virtual laser tripwire flow counter.
 
 ---
 
-## 📌 Project Overview
+## 🌟 About TrackOptic AI
 
-**TrackOptic AI** was developed as part of **Task 4: Object Detection & Tracking** for the **CodeAlpha AI Internship**. It provides an advanced real-time computer vision pipeline that:
-1. Detects objects across 80 COCO classes using pre-trained **YOLOv8s** (Precision) and **YOLOv8n** (Speed) models with workplace/indoor filtering presets.
-2. Tracks objects continuously across frames using **SORT** enhanced with **strict class-consistent IoU association** and **10-frame confidence-weighted temporal voting** to prevent identity switches and classification flickering.
-3. **Kalman Motion Trajectory Trails**: Dynamic centroid ribbons rendered behind tracked targets to visualize velocity, vector direction, and Kalman motion continuity.
-4. **Virtual Laser Tripwire & Flow Counter**: Interactive tripwire line across viewport with automatic crossing detection, bidirectional flow tracking (`⬆️ IN` / `⬇️ OUT` / `Total`), live HUD counters, and instant reset.
-5. **Multi-Spectrum Optical Vision Filters**: Instant client-side shaders for **Optical (RGB)**, **FLIR Thermal Heatmap (IR)**, and **Tactical Night Vision (NVG)**.
-6. Renders bounding boxes, class labels, confidence scores, and consistent color-coded track IDs on each frame.
-7. Streams annotated video in real-time over **WebSocket** alongside telemetry (FPS, latency in ms, detected objects, active tracks, class distribution, tripwire counts).
-8. **Interactive Vision Command Center**: Live interactive confidence and IoU sensitivity sliders, tactical targeting reticle overlay, audio target chime toggle, 1-click snapshot capture (PNG), and fullscreen viewport.
-9. **JWT User Authentication & Session Ownership**: Secure password hashing with bcrypt, access tokens, 1-click Demo Analyst mode, user profile pill, and author-tagged session history.
-10. **Telemetry Exports**: 1-click session audit export to **CSV** and **JSON**, plus detailed detection record explorer.
+**TrackOptic AI** bridges deep learning computer vision research with production-grade web infrastructure. Designed to emulate advanced industrial and tactical surveillance command centers, it processes live webcam feeds or uploaded video files at high frame rates, identifies multiple object classes simultaneously, tracks continuous spatial motion over time, and enforces rigorous boundary crossing logic.
+
+### 🎯 Key Real-World Use Cases
+- **Smart City & Traffic Flow Monitoring**: Automated vehicle and pedestrian counting with directional ingress/egress analysis (`⬆️ IN` vs `⬇️ OUT`).
+- **Industrial Workplace Safety & Occupancy**: Enforcing perimeter security and monitoring workplace occupancy using indoor object presets and containment filters.
+- **Low-Light & Tactical Operations**: Real-time simulation of multi-spectrum vision sensors including **FLIR Thermal IR** heatmaps and military **Night Vision (NVG)**.
+- **Security & Asset Protection**: Instantaneous target acquisition chimes, continuous velocity trail ribbons, and 1-click forensic HD snapshots.
+
+---
+
+## 📌 Technical Highlights & Perception Pipeline
+
+1. **Pre-Trained Deep Learning Detection**:
+   - Seamlessly toggle between **YOLOv8s** (high-precision 11.2M parameter model) and **YOLOv8n** (ultra-fast 3.2M parameter model).
+   - Real-time bounding box regression, 80 COCO category classification, and confidence scoring.
+   - Built-in **Workplace / Office Preset** filtering out absurd outdoor misclassifications.
+   - **Spatial Containment Suppression** removing low-confidence hallucinations nested within larger objects.
+
+2. **Persistent Multi-Object Tracking (SORT)**:
+   - **Constant-Velocity Kalman Filtering**: 7-state state-space vector modeling position, bounding box scale, aspect ratio, and velocity differentials.
+   - **Strict Class-Consistent Hungarian Matching**: Forces $IoU = 0.0$ across differing object classes, eliminating identity switches between adjacent targets.
+   - **10-Frame Confidence-Weighted Temporal Voting**: Sliding classification history eliminates single-frame flickering.
+
+3. **Continuous Motion Trajectory Trails**:
+   - Visualizes the last 24 historical centroid coordinates as glowing tapered velocity ribbons directly behind active tracks.
+
+4. **Virtual Laser Tripwire & Bidirectional Flow Counter**:
+   - Interactive horizontal laser threshold detecting crossing vectors in real time, calculating `IN`, `OUT`, and `TOTAL` events with live HUD overlay and 1-click reset.
+
+5. **Multi-Spectrum Optical Filters**:
+   - Zero-latency client-side shaders: **Optical (RGB)**, **FLIR Thermal IR**, and **Tactical Night Vision (NVG)**.
+
+6. **Full-Duplex WebSocket Telemetry & Control**:
+   - Bidirectional communication streaming base64 JPEG video frames alongside live FPS, latency (ms), detection counts, track counts, and class distributions.
+   - Real-time sensitivity threshold adjustments over WebSocket without stream interruptions.
+
+7. **JWT Authentication & Audit Export**:
+   - User account ownership, 1-click Demo Analyst access, and exportable session audit logs in **CSV** and **JSON** formats.
 
 ---
 
